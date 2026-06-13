@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enums\CitationStatus;
+use App\Http\Requests\StoreCitationRequest;
+use App\Models\Citation;
+use App\Models\CitationEvidence;
+use App\Models\Driver;
+use App\Models\Vehicle;
+use App\Models\ViolationType;
+use App\Services\CitationNumberService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class CitationController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $this->authorize('viewAny', Citation::class);
+
+        $query = Citation::with(['violationType', 'driver', 'vehicle', 'enforcer']);
+
+        if (! auth()->user()->isStaff()) {
+            $query->whereHas('vehicle', fn ($q) => $q->where('owner_id', auth()->id()));
+        }
+
+        $citations = $query
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($inner) use ($search) {
+                    $inner->where('citation_number', 'like', "%{$search}%")
+                        ->orWhereHas('vehicle', fn ($v) => $v->where('plate_number', 'like', "%{$search}%"));
+                });
+            })
+            ->when($request->status, fn ($q, $status) => $q->where('status', $status))
+            ->latest('issued_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('citations.index', compact('citations'));
+    }
+
+    public function create(Request $request): View
+    {
+        $this->authorize('create', Citation::class);
+
+        return view('citations.create', [
+            'violationTypes' => ViolationType::where('is_active', true)->orderBy('name')->get(),
+            'vehicles' => Vehicle::with('driver')->orderBy('plate_number')->get(),
+            'drivers' => Driver::orderBy('last_name')->get(),
+            'selectedVehicle' => $request->vehicle_id ? Vehicle::find($request->vehicle_id) : null,
+        ]);
+    }
+
+    public function store(StoreCitationRequest $request, CitationNumberService $numberService): RedirectResponse
+    {
+        $this->authorize('create', Citation::class);
+
+        $violationType = ViolationType::findOrFail($request->violation_type_id);
+
+        $citation = Citation::create([
+            'citation_number' => $numberService->generate(),
+            'violation_type_id' => $violationType->id,
+            'driver_id' => $request->driver_id,
+            'vehicle_id' => $request->vehicle_id,
+            'issued_by' => auth()->id(),
+            'penalty_amount' => $violationType->penalty_amount,
+            'status' => CitationStatus::Issued,
+            'location' => $request->location,
+            'notes' => $request->notes,
+            'issued_at' => now(),
+            'due_date' => $numberService->dueDate(),
+        ]);
+
+        if ($request->hasFile('evidence')) {
+            foreach ($request->file('evidence') as $file) {
+                $path = $file->store('citations/'.$citation->id, 'public');
+                CitationEvidence::create([
+                    'citation_id' => $citation->id,
+                    'file_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+            }
+        }
+
+        return redirect()->route('citations.show', $citation)->with('success', 'Citation issued successfully.');
+    }
+
+    public function show(Citation $citation): View
+    {
+        $this->authorize('view', $citation);
+
+        $citation->load(['violationType', 'driver', 'vehicle.owner', 'enforcer', 'evidence', 'payment.cashier']);
+
+        return view('citations.show', compact('citation'));
+    }
+}
