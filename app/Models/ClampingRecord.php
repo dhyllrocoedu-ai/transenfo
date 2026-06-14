@@ -6,9 +6,12 @@ use App\Enums\ClampingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ClampingRecord extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'notice_number',
         'vehicle_id',
@@ -52,5 +55,13 @@ class ClampingRecord extends Model
     public function isActive(): bool
     {
         return $this->status === ClampingStatus::Active;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

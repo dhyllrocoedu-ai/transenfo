@@ -14,7 +14,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('account.procedure'));
     }
 
     public function test_staff_can_login_and_view_dashboard(): void

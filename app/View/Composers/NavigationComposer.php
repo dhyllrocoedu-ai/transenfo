@@ -20,6 +20,8 @@ class NavigationComposer
 
         $items[] = ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'speedometer2'];
 
+        $items[] = ['label' => 'Notifications', 'route' => 'notifications.index', 'icon' => 'bell'];
+
         if ($user->isRole(Role::VehicleOwner)) {
             $items[] = ['label' => 'My Citations', 'route' => 'owner.citations', 'icon' => 'file-earmark-text'];
             $items[] = ['label' => 'My Vehicles', 'route' => 'owner.vehicles', 'icon' => 'car-front'];
@@ -46,9 +48,23 @@ class NavigationComposer
             }
 
             if ($user->isRole(Role::SuperAdmin, Role::Administrator)) {
-                $items[] = ['label' => 'Users', 'route' => 'users.index', 'icon' => 'people'];
+                $items[] = ['label' => 'Teams', 'route' => 'teams.index', 'icon' => 'people'];
+                $items[] = ['label' => 'Zones', 'route' => 'zones.index', 'icon' => 'geo-alt'];
+                $items[] = ['label' => 'Tracking', 'route' => 'tracking.index', 'icon' => 'broadcast'];
+                $items[] = ['label' => 'Reports', 'route' => 'reports.index', 'icon' => 'graph-up'];
+                $items[] = ['label' => 'Search', 'route' => 'search.index', 'icon' => 'search'];
+                $items[] = ['label' => 'Archives', 'route' => 'archives.index', 'icon' => 'archive'];
+                $items[] = ['label' => 'Users', 'route' => 'users.index', 'icon' => 'person-gear'];
+                $items[] = ['label' => 'Audit Logs', 'route' => 'audit-logs.index', 'icon' => 'journal-text'];
+            }
+
+            if ($user->isRole(Role::FrontDesk)) {
+                $items[] = ['label' => 'Front Desk', 'route' => 'frontdesk.index', 'icon' => 'building'];
+                $items[] = ['label' => 'Search', 'route' => 'search.index', 'icon' => 'search'];
             }
         }
+
+        $items[] = ['label' => 'Profile', 'route' => 'profile.edit', 'icon' => 'person-circle'];
 
         $view->with('navItems', $items);
     }

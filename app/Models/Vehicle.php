@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Vehicle extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'owner_id',
         'driver_id',
@@ -53,5 +56,13 @@ class Vehicle extends Model
         return $this->citations()
             ->whereIn('status', ['issued', 'overdue', 'clamped'])
             ->exists();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

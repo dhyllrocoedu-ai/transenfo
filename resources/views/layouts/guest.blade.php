@@ -6,15 +6,18 @@
     <title>@yield('title', 'Login') — {{ config('itevcms.app_name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="login-page d-flex align-items-center justify-content-center p-3">
-    <div class="login-card card w-100">
-        <div class="card-body p-4 p-md-5">
-            <div class="text-center mb-4">
-                <h4 class="mb-1">{{ config('itevcms.app_name') }}</h4>
-                <p class="text-muted small mb-0">Land Transportation Enforcement Management</p>
+<body class="login-page">
+    <div class="login-shell">
+        <div class="login-card card w-100 animate-on-load">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="login-brand-icon">LT</div>
+                    <h4 class="mb-1">{{ config('itevcms.app_name') }}</h4>
+                    <p class="text-muted small mb-0">Land Transportation Enforcement Management</p>
+                </div>
+                @include('components.alerts')
+                @yield('content')
             </div>
-            @include('components.alerts')
-            @yield('content')
         </div>
     </div>
 </body>

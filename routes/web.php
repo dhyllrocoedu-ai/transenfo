@@ -1,26 +1,59 @@
 <?php
 
 use App\Http\Controllers\AppealController;
+use App\Http\Controllers\ArchiveController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CitizenPortalController;
 use App\Http\Controllers\ClampingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\FrontDeskController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerPortalController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PayMongoController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReleaseController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('login'));
+Route::get('/', fn () => redirect()->route('account.procedure'));
 
 Route::middleware('guest')->group(function () {
+    Route::get('account-procedure', [LoginController::class, 'accountProcedure'])->name('account.procedure');
+    Route::post('account-procedure', [LoginController::class, 'store'])->name('account.procedure.store');
+
     Route::get('login', [LoginController::class, 'create'])->name('login');
     Route::post('login', [LoginController::class, 'store'])->middleware('throttle:5,1');
+    
+    Route::get('register', [LoginController::class, 'showRegister'])->name('register');
+    Route::post('register', [LoginController::class, 'storeRegister'])->middleware('throttle:5,1');
+
+    // Citizen Portal - Public access
+    Route::prefix('citizen')->name('citizen.')->group(function () {
+        Route::get('citation/lookup', [CitizenPortalController::class, 'citationLookup'])->name('citation.lookup');
+        Route::get('citation/search', [CitizenPortalController::class, 'citationSearch'])->name('citation.search');
+        Route::get('citation/{citation}', [CitizenPortalController::class, 'citationDetail'])->name('citation.detail');
+        Route::get('request-clamping', [CitizenPortalController::class, 'clampingRequest'])->name('clamping.show');
+        Route::post('request-clamping', [CitizenPortalController::class, 'storeClampingRequest'])->name('clamping.store');
+        Route::get('clamping/success', [CitizenPortalController::class, 'clampingSuccess'])->name('clamping.success');
+    });
+
+    // PayMongo Webhook (public, verified by signature)
+    Route::post('webhook/paymongo', [PayMongoController::class, 'webhook'])->name('webhook.paymongo');
 });
 
-Route::middleware(['auth', 'active'])->group(function () {
+Route::get('account/pending', fn () => view('auth.pending'))->name('account.pending');
+
+Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -33,9 +66,60 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('releases', [ReleaseController::class, 'index'])->name('releases.index');
     Route::get('releases/create/{clamping}', [ReleaseController::class, 'create'])->name('releases.create');
     Route::post('releases/{clamping}', [ReleaseController::class, 'store'])->name('releases.store');
+    Route::resource('teams', TeamController::class);
+    Route::resource('zones', ZoneController::class);
+    Route::get('tracking', [TrackingController::class, 'index'])->name('tracking.index');
+    Route::get('tracking/locations', [TrackingController::class, 'locations'])->name('tracking.locations');
 
+    // Online Payment
+    Route::get('payments/{payment}/success', [PayMongoController::class, 'success'])->name('payments.online.success');
+    Route::get('payments/{payment}/cancel', [PayMongoController::class, 'cancel'])->name('payments.online.cancel');
+    Route::post('citations/{citation}/checkout', [PayMongoController::class, 'checkout'])->name('citations.checkout');
+
+    // User management
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
+    Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
+    Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
+    Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('users/{user}/devices', [UserController::class, 'devices'])->name('users.devices');
+    Route::delete('devices/{device}/force-logout', [UserController::class, 'forceLogout'])->name('devices.force-logout');
 
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('api/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('api.notifications.unread');
+    Route::get('api/notifications/latest', [NotificationController::class, 'latest'])->name('api.notifications.latest');
+
+    // Front Desk
+    Route::get('front-desk', [FrontDeskController::class, 'index'])->name('frontdesk.index');
+    Route::get('front-desk/search', [FrontDeskController::class, 'search'])->name('frontdesk.search');
+
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('revenue', [ReportController::class, 'revenue'])->name('revenue');
+        Route::get('citations', [ReportController::class, 'citations'])->name('citations');
+        Route::get('enforcer-performance', [ReportController::class, 'enforcerPerformance'])->name('enforcer-performance');
+    });
+
+    // Archives
+    Route::get('archives', [ArchiveController::class, 'index'])->name('archives.index');
+
+    // Advanced Search
+    Route::get('search', [SearchController::class, 'index'])->name('search.index');
+    Route::post('search/save', [SearchController::class, 'save'])->name('search.save');
+    Route::delete('search/{search}', [SearchController::class, 'destroy'])->name('search.destroy');
+
+    // Audit Logs
+    Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+
+    // Profile
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Owner Portal
     Route::prefix('owner')->name('owner.')->group(function () {
         Route::get('citations', [OwnerPortalController::class, 'citations'])->name('citations');
         Route::get('vehicles', [OwnerPortalController::class, 'vehicles'])->name('vehicles');

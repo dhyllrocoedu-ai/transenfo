@@ -44,6 +44,13 @@
         @endif
     </div>
     <div class="col-lg-4">
+        <div class="card stat-card mb-3 text-center">
+            <div class="card-body py-3">
+                {!! $citation->getQRCode() !!}
+                <div class="small text-muted mt-2">Scan to view citation details</div>
+            </div>
+        </div>
+
         @if ($citation->payment)
             <div class="card stat-card mb-3">
                 <div class="card-header bg-white"><strong>Payment</strong></div>
@@ -52,12 +59,31 @@
                     <p class="mb-0 text-muted small">Paid {{ $citation->payment->paid_at->format('M d, Y') }}</p>
                 </div>
             </div>
-        @elseif ($citation->isPayable() && auth()->user()->isRole(App\Enums\Role::SuperAdmin, App\Enums\Role::Administrator, App\Enums\Role::Cashier))
-            <div class="card stat-card">
-                <div class="card-body">
-                    <a href="{{ route('payments.create', ['citation_id' => $citation->id]) }}" class="btn btn-success w-100">Record Payment</a>
+        @elseif ($citation->isPayable())
+            @if (auth()->user()->isRole(App\Enums\Role::SuperAdmin, App\Enums\Role::Administrator, App\Enums\Role::Cashier))
+                <div class="card stat-card">
+                    <div class="card-body d-grid gap-2">
+                        <a href="{{ route('payments.create', ['citation_id' => $citation->id]) }}" class="btn btn-success w-100">Record Payment</a>
+                        <form method="POST" action="{{ route('citations.checkout', $citation) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-credit-card me-2"></i>Pay Online
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            @elseif (auth()->user()->isRole(App\Enums\Role::VehicleOwner))
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('citations.checkout', $citation) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-credit-card me-2"></i>Pay Online via GCash/Maya
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 </div>

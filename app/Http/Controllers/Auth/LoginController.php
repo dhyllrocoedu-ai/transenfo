@@ -3,24 +3,41 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\SupabaseAuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function create(): View|RedirectResponse
+    public function accountProcedure(): View|RedirectResponse
     {
         if (auth()->check()) {
             return redirect()->route('dashboard');
         }
 
-        return view('auth.login');
+        $showRegister = old('_action') === 'register' || request()->query('form') === 'register';
+
+        return view('auth.account-procedure', compact('showRegister'));
+    }
+
+    public function create(): RedirectResponse
+    {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('account.procedure');
     }
 
     public function store(Request $request, SupabaseAuthService $authService): RedirectResponse
     {
+        if ($request->input('_action') === 'register') {
+            return $this->storeRegister($request);
+        }
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -29,13 +46,89 @@ class LoginController extends Controller
         $user = $authService->attempt($credentials['email'], $credentials['password']);
         $authService->login($user, $request->boolean('remember'));
 
+        $user->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        \App\Models\DeviceManager::create([
+            'user_id' => $user->id,
+            'device_name' => $request->header('User-Agent'),
+            'device_type' => $this->detectDeviceType($request->header('User-Agent')),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'session_id' => session()->getId(),
+            'last_activity' => now(),
+        ]);
+
+        if ($user->isPending()) {
+            return redirect()->route('account.pending');
+        }
+
+        if ($user->isSuspended()) {
+            auth()->logout();
+
+            return redirect()->route('account.procedure')->withErrors(['email' => 'Your account has been suspended.']);
+        }
+
         return redirect()->intended(route('dashboard'));
+    }
+
+    protected function detectDeviceType(?string $ua): string
+    {
+        if (! $ua) {
+            return 'unknown';
+        }
+        if (preg_match('/mobile|android|iphone|ipad|ipod/i', $ua)) {
+            return 'mobile';
+        }
+        if (preg_match('/tablet|ipad/i', $ua)) {
+            return 'tablet';
+        }
+
+        return 'desktop';
+    }
+
+    public function showRegister(): RedirectResponse
+    {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('account.procedure', ['form' => 'register']);
+    }
+
+    public function storeRegister(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'terms' => ['accepted'],
+        ]);
+
+        // Create user with role VehicleOwner by default
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($validated['password']),
+            'role' => 'VehicleOwner',
+            'is_active' => true,
+            'account_status' => 'pending',
+        ]);
+
+        // Log user in
+        auth()->login($user);
+
+        return redirect()->route('account.pending');
     }
 
     public function destroy(SupabaseAuthService $authService): RedirectResponse
     {
         $authService->logout();
 
-        return redirect()->route('login');
+        return redirect()->route('account.procedure');
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AppealStatus;
 use App\Enums\CitationStatus;
 use App\Enums\ClampingStatus;
 use App\Enums\Role;
+use App\Models\Appeal;
 use App\Models\Citation;
 use App\Models\ClampingRecord;
 use App\Models\Payment;
@@ -30,6 +32,7 @@ class DashboardController extends Controller
             ])->count(),
             'payments_today' => Payment::whereDate('paid_at', today())->sum('amount'),
             'active_clamps' => ClampingRecord::where('status', ClampingStatus::Active)->count(),
+            'pending_appeals' => Appeal::whereIn('status', [AppealStatus::Submitted, AppealStatus::UnderReview])->count(),
         ];
 
         $citationsByMonth = Citation::query()
@@ -46,7 +49,72 @@ class DashboardController extends Controller
             ->map(fn ($group) => $group->sum('amount'))
             ->sortKeys();
 
-        return view('dashboard.index', compact('stats', 'citationsByMonth', 'paymentsByMonth'));
+        $recentCitations = Citation::with(['vehicle', 'violationType', 'driver'])
+            ->latest('issued_at')
+            ->take(5)
+            ->get();
+
+        $recentPayments = Payment::with('citation')
+            ->latest('paid_at')
+            ->take(5)
+            ->get();
+
+        $pendingAppeals = Appeal::with('citation')
+            ->latest('submitted_at')
+            ->take(5)
+            ->get();
+
+        $activeClampRecords = ClampingRecord::with('vehicle')
+            ->where('status', ClampingStatus::Active)
+            ->latest('clamped_at')
+            ->take(5)
+            ->get();
+
+        $recentActivity = collect([
+            ...$recentCitations->map(fn (Citation $citation) => [
+                'type' => 'citation',
+                'icon' => 'bi-receipt',
+                'title' => 'Citation issued',
+                'description' => $citation->driver?->fullName().' • '.$citation->citation_number,
+                'timestamp' => $citation->issued_at,
+                'timestamp_label' => $citation->issued_at?->diffForHumans(),
+            ]),
+            ...$recentPayments->map(fn (Payment $payment) => [
+                'type' => 'payment',
+                'icon' => 'bi-cash-stack',
+                'title' => 'Payment received',
+                'description' => 'Receipt '.$payment->receipt_number.' • ₱'.number_format($payment->amount, 2),
+                'timestamp' => $payment->paid_at,
+                'timestamp_label' => $payment->paid_at?->diffForHumans(),
+            ]),
+            ...$pendingAppeals->map(fn (Appeal $appeal) => [
+                'type' => 'appeal',
+                'icon' => 'bi-chat-square-text',
+                'title' => 'Appeal submitted',
+                'description' => $appeal->citation?->citation_number ?? 'Appeal pending review',
+                'timestamp' => $appeal->submitted_at,
+                'timestamp_label' => $appeal->submitted_at?->diffForHumans(),
+            ]),
+            ...$activeClampRecords->map(fn (ClampingRecord $clamp) => [
+                'type' => 'clamp',
+                'icon' => 'bi-lock',
+                'title' => 'Vehicle clamped',
+                'description' => $clamp->vehicle?->plate_number ?? 'Clamp record updated',
+                'timestamp' => $clamp->clamped_at,
+                'timestamp_label' => $clamp->clamped_at?->diffForHumans(),
+            ]),
+        ])->sortByDesc('timestamp')->take(8)->values();
+
+        return view('dashboard.index', compact(
+            'stats',
+            'citationsByMonth',
+            'paymentsByMonth',
+            'recentCitations',
+            'recentPayments',
+            'pendingAppeals',
+            'activeClampRecords',
+            'recentActivity',
+        ));
     }
 
     protected function ownerDashboard($user): View

@@ -9,6 +9,7 @@ enum Role: string
     case Enforcer = 'enforcer';
     case ClampingOfficer = 'clamping_officer';
     case Cashier = 'cashier';
+    case FrontDesk = 'front_desk';
     case VehicleOwner = 'vehicle_owner';
 
     public function label(): string
@@ -19,6 +20,7 @@ enum Role: string
             self::Enforcer => 'Transportation Enforcer',
             self::ClampingOfficer => 'Clamping Officer',
             self::Cashier => 'Cashier',
+            self::FrontDesk => 'Front Desk',
             self::VehicleOwner => 'Vehicle Owner',
         };
     }

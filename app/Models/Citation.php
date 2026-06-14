@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Citation extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'citation_number',
         'violation_type_id',
@@ -78,4 +83,31 @@ class Citation extends Model
         return $this->status === CitationStatus::Paid
             || $this->status === CitationStatus::Released;
     }
+
+    public function getQRCode(): string
+    {
+        $url = route('citizen.citation.detail', $this, false);
+
+        return QrCode::size(150)
+            ->margin(1)
+            ->errorCorrection('M')
+            ->generate($url);
+    }
+
+    public function getQRCodeUrl(): string
+    {
+        $data = "Citation: {$this->citation_number} | Vehicle: {$this->vehicle->plate_number} | Amount: ₱{$this->penalty_amount}";
+        $encoded = urlencode($data);
+
+        return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={$encoded}";
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 }
+

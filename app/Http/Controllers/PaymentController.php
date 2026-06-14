@@ -19,7 +19,7 @@ class PaymentController extends Controller
     {
         $this->authorize('viewAny', Payment::class);
 
-        $query = Payment::with(['citation.vehicle', 'cashier']);
+        $query = Payment::with(['citation.vehicle', 'cashier'])->whereNotNull('paid_at');
 
         if (! auth()->user()->isStaff()) {
             $query->whereHas('citation.vehicle', fn ($q) => $q->where('owner_id', auth()->id()));

@@ -24,10 +24,6 @@ class PaymentPolicy
 
     public function create(User $user): bool
     {
-        return $user->isRole(
-            Role::SuperAdmin,
-            Role::Administrator,
-            Role::Cashier
-        );
+        return $user->isStaff();
     }
 }

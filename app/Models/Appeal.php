@@ -5,9 +5,12 @@ namespace App\Models;
 use App\Enums\AppealStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Appeal extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'citation_id',
         'submitted_by',
@@ -42,5 +45,13 @@ class Appeal extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
