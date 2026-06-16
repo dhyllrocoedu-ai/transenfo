@@ -10,16 +10,12 @@ class ClampingPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isStaff() || $user->isRole(Role::VehicleOwner);
+        return $user->isStaff();
     }
 
     public function view(User $user, ClampingRecord $clampingRecord): bool
     {
-        if ($user->isStaff()) {
-            return true;
-        }
-
-        return $clampingRecord->vehicle?->owner_id === $user->id;
+        return $user->isStaff();
     }
 
     public function create(User $user): bool

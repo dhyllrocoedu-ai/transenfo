@@ -55,19 +55,19 @@
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">License Plate:</span>
-                <span class="detail-row-value fw-bold fs-5">{{ $citation->vehicle->plate_number }}</span>
+                <span class="detail-row-value fw-bold fs-5">{{ $citation->vehicle_plate }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">Make/Model:</span>
-                <span class="detail-row-value">{{ $citation->vehicle->make }} {{ $citation->vehicle->model }}</span>
+                <span class="detail-row-value">{{ $citation->vehicle_make }} {{ $citation->vehicle_model }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">Type/Year:</span>
-                <span class="detail-row-value">{{ $citation->vehicle->classification }}, {{ $citation->vehicle->year }}</span>
+                <span class="detail-row-value">{{ $citation->vehicle_type ?? '—' }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">Color:</span>
-                <span class="detail-row-value">{{ $citation->vehicle->color }}</span>
+                <span class="detail-row-value">{{ $citation->vehicle_color ?? '—' }}</span>
             </div>
         </div>
 
@@ -110,15 +110,15 @@
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">Full Name:</span>
-                <span class="detail-row-value">{{ $citation->driver->fullName() ?? 'N/A' }}</span>
+                <span class="detail-row-value">{{ $citation->driver_name ?? 'N/A' }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">License No.:</span>
-                <span class="detail-row-value">{{ $citation->driver->license_number ?? 'N/A' }}</span>
+                <span class="detail-row-value">{{ $citation->driver_license ?? 'N/A' }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-row-label">Phone:</span>
-                <span class="detail-row-value">{{ $citation->driver->contact_number ?? 'N/A' }}</span>
+                <span class="detail-row-value">{{ '—' }}</span>
             </div>
         </div>
     </div>
@@ -351,19 +351,19 @@ function openModal(imageSrc) {
                                 <tbody>
                                     <tr>
                                         <th class="text-muted fw-normal w-30">Plate Number:</th>
-                                        <td class="fw-bold fs-5">{{ $citation->vehicle->plate_number }}</td>
+                                        <td class="fw-bold fs-5">{{ $citation->vehicle_plate }}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-muted fw-normal">Type:</th>
-                                        <td>{{ $citation->vehicle->classification }} - {{ $citation->vehicle->make }} {{ $citation->vehicle->model }}</td>
+                                        <td>{{ $citation->vehicle_type ?? '—' }} - {{ $citation->vehicle_make }} {{ $citation->vehicle_model }}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-muted fw-normal">Color/Year:</th>
-                                        <td>{{ $citation->vehicle->color }}, {{ $citation->vehicle->year }}</td>
+                                        <td>{{ $citation->vehicle_color ?? '—' }}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-muted fw-normal">Driver:</th>
-                                        <td>{{ $citation->driver->fullName() ?? 'N/A' }}</td>
+                                        <td>{{ $citation->driver_name ?? 'N/A' }}</td>
                                     </tr>
                                 </tbody>
                             </table>

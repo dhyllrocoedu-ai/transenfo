@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\CitationStatus;
 use App\Enums\ClampingStatus;
 use App\Http\Requests\StoreClampingRequest;
+use App\Models\Citation;
 use App\Models\ClampingRecord;
-use App\Models\Vehicle;
+use App\Models\ClampingRequest as CitizenClampingRequest;
 use App\Services\CitationNumberService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,52 +19,56 @@ class ClampingController extends Controller
     {
         $this->authorize('viewAny', ClampingRecord::class);
 
-        $query = ClampingRecord::with(['vehicle', 'officer', 'citation']);
-
-        if (! auth()->user()->isStaff()) {
-            $query->whereHas('vehicle', fn ($q) => $q->where('owner_id', auth()->id()));
-        }
+        $query = ClampingRecord::with(['officer', 'citation']);
 
         $records = $query->latest('clamped_at')->paginate(15);
 
-        $eligibleDays = config('itevcms.clamping_eligible_days');
-        $eligibleVehicles = collect();
+        $pendingRequests = CitizenClampingRequest::where('status', 'pending')
+            ->latest()
+            ->get();
 
+        $overdueCitations = collect();
         if (auth()->user()->isRole(\App\Enums\Role::SuperAdmin, \App\Enums\Role::Administrator, \App\Enums\Role::ClampingOfficer)) {
-            $eligibleVehicles = Vehicle::query()
-                ->whereDoesntHave('clampingRecords', fn ($q) => $q->where('status', ClampingStatus::Active))
-                ->whereHas('citations', function ($q) use ($eligibleDays) {
-                    $q->whereIn('status', [CitationStatus::Overdue, CitationStatus::Issued])
-                        ->whereDate('due_date', '<=', now()->subDays($eligibleDays));
-                })
-                ->with(['citations' => fn ($q) => $q->whereIn('status', [CitationStatus::Overdue, CitationStatus::Issued])])
-                ->orderBy('plate_number')
+            $eligibleDays = config('itevcms.clamping_eligible_days');
+            $overdueCitations = Citation::whereIn('status', [CitationStatus::Overdue, CitationStatus::Issued])
+                ->whereDate('due_date', '<=', now()->subDays($eligibleDays))
+                ->whereDoesntHave('clampingRecords')
+                ->orderBy('vehicle_plate')
                 ->get();
         }
 
-        return view('clamping.index', compact('records', 'eligibleVehicles'));
+        return view('clamping.index', compact('records', 'pendingRequests', 'overdueCitations'));
     }
 
     public function create(Request $request): View
     {
         $this->authorize('create', ClampingRecord::class);
 
-        $vehicle = $request->vehicle_id ? Vehicle::with('citations')->find($request->vehicle_id) : null;
+        $plate = $request->vehicle_plate;
+        $citation = null;
+        if ($plate) {
+            $citation = Citation::where('vehicle_plate', $plate)
+                ->whereIn('status', [CitationStatus::Issued, CitationStatus::Overdue])
+                ->latest('issued_at')
+                ->first();
+        }
 
-        return view('clamping.create', compact('vehicle'));
+        return view('clamping.create', compact('plate', 'citation'));
     }
 
     public function store(StoreClampingRequest $request, CitationNumberService $numberService): RedirectResponse
     {
         $this->authorize('create', ClampingRecord::class);
 
-        $vehicle = Vehicle::findOrFail($request->vehicle_id);
+        $existingClamp = ClampingRecord::where('vehicle_plate', $request->vehicle_plate)
+            ->where('status', ClampingStatus::Active)
+            ->exists();
 
-        if ($vehicle->activeClamp()) {
-            return back()->withErrors(['vehicle_id' => 'This vehicle is already clamped.']);
+        if ($existingClamp) {
+            return back()->withErrors(['vehicle_plate' => 'This vehicle is already clamped.']);
         }
 
-        $citation = $vehicle->citations()
+        $citation = Citation::where('vehicle_plate', $request->vehicle_plate)
             ->whereIn('status', [CitationStatus::Issued, CitationStatus::Overdue])
             ->latest('issued_at')
             ->first();
@@ -75,7 +80,7 @@ class ClampingController extends Controller
 
         $record = ClampingRecord::create([
             'notice_number' => $numberService->noticeNumber(),
-            'vehicle_id' => $vehicle->id,
+            'vehicle_plate' => $request->vehicle_plate,
             'citation_id' => $citation?->id,
             'clamped_by' => auth()->id(),
             'status' => ClampingStatus::Active,
@@ -96,7 +101,7 @@ class ClampingController extends Controller
     {
         $this->authorize('view', $clamping);
 
-        $clamping->load(['vehicle.owner', 'officer', 'citation', 'release.releasedByUser']);
+        $clamping->load(['officer', 'citation']);
 
         return view('clamping.show', compact('clamping'));
     }

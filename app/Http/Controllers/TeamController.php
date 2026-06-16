@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Zone;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,10 +26,10 @@ class TeamController extends Controller
     {
         $this->authorizeAdmin();
 
-        return view('teams.create', [
-            'leaders' => User::query()->whereIn('role', ['super_admin', 'administrator', 'enforcer'])->orderBy('name')->get(),
-            'members' => User::query()->whereIn('role', ['super_admin', 'administrator', 'enforcer'])->orderBy('name')->get(),
-        ]);
+        $enforcers = User::query()->where('role', Role::Enforcer->value)->orderBy('name')->get();
+        $zones = Zone::with('team:id,name')->get(['id', 'name', 'center_latitude', 'center_longitude', 'radius_m', 'team_id']);
+
+        return view('teams.create', compact('enforcers', 'zones'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -52,10 +55,13 @@ class TeamController extends Controller
     {
         $this->authorizeAdmin();
 
+        $enforcers = User::query()->where('role', Role::Enforcer->value)->orderBy('name')->get();
+        $zones = Zone::with('team:id,name')->get(['id', 'name', 'center_latitude', 'center_longitude', 'radius_m', 'team_id']);
+
         return view('teams.edit', [
             'team' => $team->load(['members']),
-            'leaders' => User::query()->whereIn('role', ['super_admin', 'administrator', 'enforcer'])->orderBy('name')->get(),
-            'members' => User::query()->whereIn('role', ['super_admin', 'administrator', 'enforcer'])->orderBy('name')->get(),
+            'enforcers' => $enforcers,
+            'zones' => $zones,
         ]);
     }
 
@@ -76,6 +82,25 @@ class TeamController extends Controller
         $team->members()->sync($data['members'] ?? []);
 
         return redirect()->route('teams.index')->with('success', 'Team updated successfully.');
+    }
+
+    public function toggleZone(Request $request, Team $team, Zone $zone): JsonResponse
+    {
+        $this->authorizeAdmin();
+
+        $assigned = $request->boolean('assigned');
+        if ($assigned) {
+            $zone->update(['team_id' => $team->id]);
+        } else {
+            $zone->update(['team_id' => null]);
+        }
+
+        return response()->json([
+            'assigned' => $assigned,
+            'zone_id' => $zone->id,
+            'team_id' => $assigned ? $team->id : null,
+            'assigned_count' => $team->zones()->count(),
+        ]);
     }
 
     protected function authorizeAdmin(): void

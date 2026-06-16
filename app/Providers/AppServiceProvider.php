@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Appeal;
+use App\Models\ClampingRecord;
 use App\Policies\AppealPolicy;
+use App\Policies\ClampingPolicy;
 use App\View\Composers\NavigationComposer;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
         Gate::policy(Appeal::class, AppealPolicy::class);
+        Gate::policy(ClampingRecord::class, ClampingPolicy::class);
         View::composer('layouts.app', NavigationComposer::class);
     }
 }

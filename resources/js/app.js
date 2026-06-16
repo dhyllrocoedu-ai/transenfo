@@ -1,9 +1,12 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.bootstrap5.css';
 import * as bootstrap from 'bootstrap';
 import Chart from 'chart.js/auto';
 
 window.bootstrap = bootstrap;
 window.Chart = Chart;
+window.TomSelect = TomSelect;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {

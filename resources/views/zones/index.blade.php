@@ -26,7 +26,7 @@
                     <div class="mt-3 small text-muted">
                         <div><strong>Assigned Team:</strong> {{ $zone->team?->name ?? 'Unassigned' }}</div>
                         <div><strong>Center:</strong> {{ $zone->center_latitude }}, {{ $zone->center_longitude }}</div>
-                        <div><strong>Radius:</strong> {{ $zone->radius_km }} km</div>
+                        <div><strong>Radius:</strong> {{ $zone->radius_m }} m</div>
                     </div>
                     <div class="mt-3">
                         <a href="{{ route('zones.edit', $zone) }}" class="btn btn-sm btn-outline-primary">Edit</a>

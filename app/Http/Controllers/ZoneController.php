@@ -23,7 +23,10 @@ class ZoneController extends Controller
     {
         $this->authorizeAdmin();
 
-        return view('zones.create', ['teams' => Team::orderBy('name')->get()]);
+        $zones = Zone::with('team:id,name')->get(['id', 'name', 'center_latitude', 'center_longitude', 'radius_m', 'team_id']);
+        $teams = Team::orderBy('name')->get();
+
+        return view('zones.create', compact('zones', 'teams'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,7 +39,7 @@ class ZoneController extends Controller
             'team_id' => ['nullable', 'exists:teams,id'],
             'center_latitude' => ['required', 'numeric'],
             'center_longitude' => ['required', 'numeric'],
-            'radius_km' => ['required', 'numeric'],
+            'radius_m' => ['required', 'numeric'],
             'is_active' => ['boolean'],
         ]);
 
@@ -49,7 +52,10 @@ class ZoneController extends Controller
     {
         $this->authorizeAdmin();
 
-        return view('zones.edit', ['zone' => $zone, 'teams' => Team::orderBy('name')->get()]);
+        $zones = Zone::with('team:id,name')->where('id', '!=', $zone->id)->get(['id', 'name', 'center_latitude', 'center_longitude', 'radius_m', 'team_id']);
+        $teams = Team::orderBy('name')->get();
+
+        return view('zones.edit', compact('zone', 'zones', 'teams'));
     }
 
     public function update(Request $request, Zone $zone): RedirectResponse
@@ -62,7 +68,7 @@ class ZoneController extends Controller
             'team_id' => ['nullable', 'exists:teams,id'],
             'center_latitude' => ['required', 'numeric'],
             'center_longitude' => ['required', 'numeric'],
-            'radius_km' => ['required', 'numeric'],
+            'radius_m' => ['required', 'numeric'],
             'is_active' => ['boolean'],
         ]);
 

@@ -20,7 +20,7 @@
                 <h5 class="card-title">Appeal Summary</h5>
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Citation</dt>
-                    <dd class="col-sm-8">{{ $appeal->citation->citation_number ?? '—' }}</dd>
+                    <dd class="col-sm-8">{{ $appeal->citation->citation_number ?? '—' }} ({{ $appeal->citation->vehicle_plate ?? '—' }})</dd>
                     <dt class="col-sm-4">Submitted By</dt>
                     <dd class="col-sm-8">{{ $appeal->submitter->name ?? '—' }}</dd>
                     <dt class="col-sm-4">Reason</dt>
@@ -29,6 +29,8 @@
                     <dd class="col-sm-8">{{ $appeal->description ?? '—' }}</dd>
                     <dt class="col-sm-4">Status</dt>
                     <dd class="col-sm-8"><span class="badge {{ $appeal->status->badgeClass() }}">{{ $appeal->status->label() }}</span></dd>
+                    <dt class="col-sm-4">Original Amount</dt>
+                    <dd class="col-sm-8">₱{{ number_format($appeal->citation->penalty_amount, 2) }}</dd>
                     <dt class="col-sm-4">Decision Notes</dt>
                     <dd class="col-sm-8">{{ $appeal->decision_notes ?? '—' }}</dd>
                 </dl>

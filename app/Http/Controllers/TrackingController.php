@@ -58,7 +58,7 @@ class TrackingController extends Controller
                 'team' => $closestZone?->team?->name ?? '—',
                 'zone_name' => $closestZone?->name ?? 'No zone',
                 'distance_km' => round($shortestDistance ?? 0, 2),
-                'inside_zone' => $closestZone && ($shortestDistance ?? 999) <= ($closestZone->radius_km ?? 0),
+                'inside_zone' => $closestZone && (($shortestDistance ?? 999) * 1000) <= ($closestZone->radius_m ?? 0),
                 'last_seen_label' => $location->last_seen_at?->diffForHumans() ?? 'Never',
             ];
         });
@@ -68,7 +68,7 @@ class TrackingController extends Controller
             'name' => $z->name,
             'center_lat' => (float) $z->center_latitude,
             'center_lng' => (float) $z->center_longitude,
-            'radius_km' => (float) $z->radius_km,
+            'radius_m' => (float) $z->radius_m,
             'team' => $z->team?->name,
         ]);
 

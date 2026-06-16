@@ -14,7 +14,7 @@ class ClampingRecord extends Model
     use LogsActivity;
     protected $fillable = [
         'notice_number',
-        'vehicle_id',
+        'vehicle_plate',
         'citation_id',
         'clamped_by',
         'status',
@@ -32,11 +32,6 @@ class ClampingRecord extends Model
         ];
     }
 
-    public function vehicle(): BelongsTo
-    {
-        return $this->belongsTo(Vehicle::class);
-    }
-
     public function citation(): BelongsTo
     {
         return $this->belongsTo(Citation::class);
@@ -45,11 +40,6 @@ class ClampingRecord extends Model
     public function officer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'clamped_by');
-    }
-
-    public function release(): HasOne
-    {
-        return $this->hasOne(VehicleRelease::class);
     }
 
     public function isActive(): bool

@@ -17,8 +17,8 @@
             <div class="card-header bg-white"><strong>Citation Details</strong></div>
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-6"><strong class="text-muted small d-block">Vehicle</strong>{{ $citation->vehicle->plate_number }}</div>
-                    <div class="col-md-6"><strong class="text-muted small d-block">Driver</strong>{{ $citation->driver?->fullName() ?? '—' }}</div>
+                    <div class="col-md-6"><strong class="text-muted small d-block">Vehicle</strong>{{ $citation->vehicle_plate }}</div>
+                    <div class="col-md-6"><strong class="text-muted small d-block">Driver</strong>{{ $citation->driver_name ?? '—' }}</div>
                     <div class="col-md-6"><strong class="text-muted small d-block">Penalty</strong>₱{{ number_format($citation->penalty_amount, 2) }}</div>
                     <div class="col-md-6"><strong class="text-muted small d-block">Due Date</strong>{{ $citation->due_date->format('M d, Y') }}</div>
                     <div class="col-md-6"><strong class="text-muted small d-block">Issued By</strong>{{ $citation->enforcer->name }}</div>

@@ -19,6 +19,7 @@ class User extends Authenticatable
         'supabase_id',
         'name',
         'email',
+        'email_verified_at',
         'password',
         'role',
         'is_active',
@@ -44,16 +45,6 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',
         ];
-    }
-
-    public function driver(): HasOne
-    {
-        return $this->hasOne(Driver::class);
-    }
-
-    public function ownedVehicles(): HasMany
-    {
-        return $this->hasMany(Vehicle::class, 'owner_id');
     }
 
     public function issuedCitations(): HasMany

@@ -29,7 +29,7 @@
                     <tr>
                         <td>{{ $payment->receipt_number }}</td>
                         <td>{{ $payment->citation->citation_number }}</td>
-                        <td>{{ $payment->citation->vehicle->plate_number }}</td>
+                        <td>{{ $payment->citation->vehicle_plate }}</td>
                         <td>₱{{ number_format($payment->amount, 2) }}</td>
                         <td>{{ $payment->payment_method->label() }}</td>
                         <td>{{ $payment->paid_at->format('M d, Y') }}</td>

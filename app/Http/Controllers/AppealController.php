@@ -15,7 +15,7 @@ class AppealController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Appeal::with(['citation.vehicle', 'submitter', 'reviewer']);
+        $query = Appeal::with(['citation', 'submitter', 'reviewer']);
 
         if (! auth()->user()->isStaff()) {
             $query->where('submitted_by', auth()->id());
@@ -32,9 +32,7 @@ class AppealController extends Controller
 
     public function create(): View
     {
-        $citations = Citation::query()
-            ->whereHas('vehicle', fn ($query) => $query->where('owner_id', auth()->id()))
-            ->with(['violationType', 'vehicle'])
+        $citations = Citation::with(['violationType'])
             ->latest('issued_at')
             ->get();
 
@@ -44,10 +42,6 @@ class AppealController extends Controller
     public function store(StoreAppealRequest $request): RedirectResponse
     {
         $citation = Citation::findOrFail($request->citation_id);
-
-        if ($citation->vehicle?->owner_id !== auth()->id()) {
-            abort(403);
-        }
 
         Appeal::create([
             'citation_id' => $citation->id,
@@ -65,7 +59,7 @@ class AppealController extends Controller
     {
         $this->authorize('view', $appeal);
 
-        $appeal->load(['citation.violationType', 'citation.vehicle', 'submitter', 'reviewer']);
+        $appeal->load(['citation.violationType', 'submitter', 'reviewer']);
 
         return view('appeals.show', compact('appeal'));
     }
@@ -87,6 +81,12 @@ class AppealController extends Controller
             'decision_notes' => $request->decision_notes,
             'reviewed_at' => now(),
         ]);
+
+        if ($request->status === 'approved' && $request->filled('adjusted_amount')) {
+            $appeal->citation->update([
+                'penalty_amount' => $request->adjusted_amount,
+            ]);
+        }
 
         return redirect()->route('appeals.show', $appeal)->with('success', 'Appeal updated successfully.');
     }

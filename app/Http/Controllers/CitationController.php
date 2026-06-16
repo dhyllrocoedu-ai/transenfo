@@ -6,8 +6,6 @@ use App\Enums\CitationStatus;
 use App\Http\Requests\StoreCitationRequest;
 use App\Models\Citation;
 use App\Models\CitationEvidence;
-use App\Models\Driver;
-use App\Models\Vehicle;
 use App\Models\ViolationType;
 use App\Services\CitationNumberService;
 use Illuminate\Http\RedirectResponse;
@@ -20,17 +18,13 @@ class CitationController extends Controller
     {
         $this->authorize('viewAny', Citation::class);
 
-        $query = Citation::with(['violationType', 'driver', 'vehicle', 'enforcer']);
-
-        if (! auth()->user()->isStaff()) {
-            $query->whereHas('vehicle', fn ($q) => $q->where('owner_id', auth()->id()));
-        }
+        $query = Citation::with(['violationType', 'enforcer']);
 
         $citations = $query
             ->when($request->search, function ($q, $search) {
                 $q->where(function ($inner) use ($search) {
                     $inner->where('citation_number', 'like', "%{$search}%")
-                        ->orWhereHas('vehicle', fn ($v) => $v->where('plate_number', 'like', "%{$search}%"));
+                        ->orWhere('vehicle_plate', 'like', "%{$search}%");
                 });
             })
             ->when($request->status, fn ($q, $status) => $q->where('status', $status))
@@ -47,9 +41,7 @@ class CitationController extends Controller
 
         return view('citations.create', [
             'violationTypes' => ViolationType::where('is_active', true)->orderBy('name')->get(),
-            'vehicles' => Vehicle::with('driver')->orderBy('plate_number')->get(),
-            'drivers' => Driver::orderBy('last_name')->get(),
-            'selectedVehicle' => $request->vehicle_id ? Vehicle::find($request->vehicle_id) : null,
+            'selectedPlate' => $request->vehicle_plate,
         ]);
     }
 
@@ -62,8 +54,13 @@ class CitationController extends Controller
         $citation = Citation::create([
             'citation_number' => $numberService->generate(),
             'violation_type_id' => $violationType->id,
-            'driver_id' => $request->driver_id,
-            'vehicle_id' => $request->vehicle_id,
+            'vehicle_plate' => $request->vehicle_plate,
+            'vehicle_make' => $request->vehicle_make,
+            'vehicle_model' => $request->vehicle_model,
+            'vehicle_type' => $request->vehicle_type,
+            'vehicle_color' => $request->vehicle_color,
+            'driver_name' => $request->driver_name,
+            'driver_license' => $request->driver_license,
             'issued_by' => auth()->id(),
             'penalty_amount' => $violationType->penalty_amount,
             'status' => CitationStatus::Issued,
@@ -91,7 +88,7 @@ class CitationController extends Controller
     {
         $this->authorize('view', $citation);
 
-        $citation->load(['violationType', 'driver', 'vehicle.owner', 'enforcer', 'evidence', 'payment.cashier']);
+        $citation->load(['violationType', 'enforcer', 'evidence', 'payment.cashier']);
 
         return view('citations.show', compact('citation'));
     }

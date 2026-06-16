@@ -3,27 +3,29 @@
 use App\Http\Controllers\AppealController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CitizenPortalController;
 use App\Http\Controllers\ClampingController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DriverController;
 use App\Http\Controllers\FrontDeskController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerPortalController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PayMongoController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReleaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/welcome', fn () => view('welcome'))->name('welcome');
 
 Route::get('/', fn () => redirect()->route('account.procedure'));
 
@@ -36,6 +38,12 @@ Route::middleware('guest')->group(function () {
     
     Route::get('register', [LoginController::class, 'showRegister'])->name('register');
     Route::post('register', [LoginController::class, 'storeRegister'])->middleware('throttle:5,1');
+
+    // Password Reset via Supabase
+    Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('password/reset/callback', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
     // Citizen Portal - Public access
     Route::prefix('citizen')->name('citizen.')->group(function () {
@@ -53,20 +61,22 @@ Route::middleware('guest')->group(function () {
 
 Route::get('account/pending', fn () => view('auth.pending'))->name('account.pending');
 
+// Email Verification
+Route::get('email/verify', [VerificationController::class, 'showNotice'])->name('verification.notice');
+Route::get('email/verify/callback', fn () => view('auth.verify-callback'))->name('verification.callback');
+Route::post('email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
+Route::post('email/verification-notification', [VerificationController::class, 'resend'])->name('verification.resend');
+
 Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('drivers', DriverController::class);
-    Route::resource('vehicles', VehicleController::class);
     Route::resource('citations', CitationController::class)->only(['index', 'create', 'store', 'show']);
     Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'show']);
     Route::resource('clamping', ClampingController::class)->only(['index', 'create', 'store', 'show']);
     Route::resource('appeals', AppealController::class);
-    Route::get('releases', [ReleaseController::class, 'index'])->name('releases.index');
-    Route::get('releases/create/{clamping}', [ReleaseController::class, 'create'])->name('releases.create');
-    Route::post('releases/{clamping}', [ReleaseController::class, 'store'])->name('releases.store');
     Route::resource('teams', TeamController::class);
+    Route::post('teams/{team}/zones/{zone}/toggle', [TeamController::class, 'toggleZone'])->name('teams.zones.toggle');
     Route::resource('zones', ZoneController::class);
     Route::get('tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('tracking/locations', [TrackingController::class, 'locations'])->name('tracking.locations');
@@ -81,6 +91,7 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
     Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
     Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
     Route::get('users/{user}/devices', [UserController::class, 'devices'])->name('users.devices');
     Route::delete('devices/{device}/force-logout', [UserController::class, 'forceLogout'])->name('devices.force-logout');
 
@@ -122,7 +133,7 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     // Owner Portal
     Route::prefix('owner')->name('owner.')->group(function () {
         Route::get('citations', [OwnerPortalController::class, 'citations'])->name('citations');
-        Route::get('vehicles', [OwnerPortalController::class, 'vehicles'])->name('vehicles');
+        Route::get('vehicles', fn () => view('owner.vehicles'))->name('vehicles');
         Route::get('clamping', [OwnerPortalController::class, 'clamping'])->name('clamping');
     });
 });

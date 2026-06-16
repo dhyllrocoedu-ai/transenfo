@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\DeviceManager;
 use App\Models\SystemNotification;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,13 +24,14 @@ class UserController extends Controller
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             }))
+            ->when($request->role, fn ($q, $r) => $q->where('role', $r))
             ->when($request->account_status, fn ($q, $s) => $q->where('account_status', $s))
             ->orderByRaw("CASE account_status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 WHEN 'suspended' THEN 3 ELSE 4 END")
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
-        return view('users.index', compact('users'));
+        return view('users.index', ['users' => $users, 'roles' => Role::cases()]);
     }
 
     public function create(): View
@@ -101,6 +103,20 @@ class UserController extends Controller
         activity()->performedOn($user)->log("Rejected user {$user->name}");
 
         return back()->with('success', "User {$user->name} rejected.");
+    }
+
+    public function toggleActive(Request $request, User $user): JsonResponse|RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        $isActive = $request->boolean('is_active');
+        $user->update(['is_active' => $isActive]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'is_active' => $isActive]);
+        }
+
+        return back()->with('success', "User {$user->name} " . ($isActive ? 'activated' : 'deactivated') . ".");
     }
 
     public function toggleStatus(User $user): RedirectResponse

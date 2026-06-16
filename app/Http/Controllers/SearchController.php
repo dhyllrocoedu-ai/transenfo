@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Citation;
 use App\Models\ClampingRecord;
 use App\Models\SavedSearch;
-use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -22,24 +21,13 @@ class SearchController extends Controller
 
             if (in_array($type, ['all', 'citation'], true)) {
                 $results = $results->merge(
-                    Citation::with(['vehicle', 'violationType', 'driver'])
+                    Citation::with(['violationType'])
                         ->where('citation_number', 'like', $queryLike)
                         ->orWhere('location', 'like', $queryLike)
-                        ->orWhereHas('vehicle', fn ($q) => $q->where('plate_number', 'like', $queryLike))
-                        ->orWhereHas('driver', fn ($q) => $q->where('first_name', 'like', $queryLike)->orWhere('last_name', 'like', $queryLike))
+                        ->orWhere('vehicle_plate', 'like', $queryLike)
+                        ->orWhere('driver_name', 'like', $queryLike)
                         ->get()
-                        ->map(fn ($c) => ['type' => 'Citation', 'id' => $c->id, 'label' => $c->citation_number, 'subtitle' => $c->vehicle?->plate_number, 'url' => route('citations.show', $c)])
-                );
-            }
-
-            if (in_array($type, ['all', 'vehicle'], true)) {
-                $results = $results->merge(
-                    Vehicle::with('owner')
-                        ->where('plate_number', 'like', $queryLike)
-                        ->orWhere('make', 'like', $queryLike)
-                        ->orWhere('model', 'like', $queryLike)
-                        ->get()
-                        ->map(fn ($v) => ['type' => 'Vehicle', 'id' => $v->id, 'label' => $v->plate_number, 'subtitle' => "{$v->make} {$v->model}", 'url' => route('vehicles.show', $v)])
+                        ->map(fn ($c) => ['type' => 'Citation', 'id' => $c->id, 'label' => $c->citation_number, 'subtitle' => $c->vehicle_plate, 'url' => route('citations.show', $c)])
                 );
             }
         }

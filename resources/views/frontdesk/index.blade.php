@@ -32,7 +32,7 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4"><strong class="text-muted small d-block">Citation #</strong>{{ $citation->citation_number }}</div>
-                <div class="col-md-4"><strong class="text-muted small d-block">Vehicle</strong>{{ $citation->vehicle->plate_number }}</div>
+                <div class="col-md-4"><strong class="text-muted small d-block">Vehicle</strong>{{ $citation->vehicle_plate }}</div>
                 <div class="col-md-4"><strong class="text-muted small d-block">Violation</strong>{{ $citation->violationType->name }}</div>
                 <div class="col-md-4"><strong class="text-muted small d-block">Amount</strong>₱{{ number_format($citation->penalty_amount, 2) }}</div>
                 <div class="col-md-4"><strong class="text-muted small d-block">Status</strong><span class="badge {{ $citation->status->badgeClass() }}">{{ $citation->status->label() }}</span></div>
@@ -43,14 +43,14 @@
             </div>
         </div>
     </div>
-@elseif (isset($vehicle))
+@elseif (isset($citation))
     <div class="card stat-card">
         <div class="card-header bg-white"><strong>Vehicle Information</strong></div>
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-4"><strong class="text-muted small d-block">Plate #</strong>{{ $vehicle->plate_number }}</div>
-                <div class="col-md-4"><strong class="text-muted small d-block">Make/Model</strong>{{ $vehicle->make }} {{ $vehicle->model }}</div>
-                <div class="col-md-4"><strong class="text-muted small d-block">Owner</strong>{{ $vehicle->owner?->name ?? '—' }}</div>
+                <div class="col-md-4"><strong class="text-muted small d-block">Plate #</strong>{{ $citation->vehicle_plate }}</div>
+                <div class="col-md-4"><strong class="text-muted small d-block">Make/Model</strong>{{ $citation->vehicle_make }} {{ $citation->vehicle_model }}</div>
+                <div class="col-md-4"><strong class="text-muted small d-block">Driver</strong>{{ $citation->driver_name ?? '—' }}</div>
             </div>
             <div class="mt-3 text-muted small">No citations found for this vehicle.</div>
         </div>

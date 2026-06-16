@@ -98,7 +98,7 @@ class LoginController extends Controller
         return redirect()->route('account.procedure', ['form' => 'register']);
     }
 
-    public function storeRegister(Request $request): RedirectResponse
+    public function storeRegister(Request $request, SupabaseAuthService $authService): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -108,21 +108,25 @@ class LoginController extends Controller
             'terms' => ['accepted'],
         ]);
 
-        // Create user with role VehicleOwner by default
+        $supabaseId = $authService->signupWithVerification(
+            $validated['name'],
+            $validated['email'],
+            $validated['password']
+        );
+
         $user = User::create([
+            'supabase_id' => $supabaseId,
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
             'role' => 'VehicleOwner',
             'is_active' => true,
             'account_status' => 'pending',
         ]);
 
-        // Log user in
         auth()->login($user);
 
-        return redirect()->route('account.pending');
+        return redirect()->route('verification.notice');
     }
 
     public function destroy(SupabaseAuthService $authService): RedirectResponse

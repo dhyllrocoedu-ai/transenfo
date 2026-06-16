@@ -15,8 +15,13 @@ class StoreCitationRequest extends FormRequest
     {
         return [
             'violation_type_id' => ['required', 'exists:violation_types,id'],
-            'driver_id' => ['nullable', 'exists:drivers,id'],
-            'vehicle_id' => ['required', 'exists:vehicles,id'],
+            'vehicle_plate' => ['required', 'string', 'max:20'],
+            'vehicle_make' => ['nullable', 'string', 'max:100'],
+            'vehicle_model' => ['nullable', 'string', 'max:100'],
+            'vehicle_type' => ['nullable', 'string', 'max:100'],
+            'vehicle_color' => ['nullable', 'string', 'max:50'],
+            'driver_name' => ['nullable', 'string', 'max:255'],
+            'driver_license' => ['nullable', 'string', 'max:50'],
             'location' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
             'evidence' => ['nullable', 'array'],

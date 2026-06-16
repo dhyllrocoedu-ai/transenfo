@@ -3,101 +3,150 @@
 @section('title', 'Report Illegal Parking')
 
 @section('content')
-<div class="container py-5" style="max-width: 700px;">
-    <div class="d-flex align-items-center gap-3 mb-4 animate-on-load">
-        <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+<style>
+    .login-shell {
+        width: min(100%, 860px) !important;
+    }
+    .login-page {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    .section-divider {
+        border-bottom: 2px solid rgba(37, 99, 235, 0.12);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+    .form-control::placeholder {
+        color: #666 !important;
+        opacity: 1;
+    }
+    .stat-card {
+        background: #fff !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+    }
+</style>
+<div class="container py-3">
+    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap animate-on-load">
+        <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
         <div>
-            <h2 class="mb-0">Report Illegally Parked Vehicle</h2>
-            <p class="text-muted mb-0">Help us enforce parking regulations in your area</p>
+            <h2 class="mb-0 h4">Report Illegally Parked Vehicle</h2>
+            <p class="text-muted mb-0 small">Help us enforce parking regulations in your area</p>
         </div>
     </div>
 
     <div class="card stat-card animate-on-load">
-        <div class="card-body">
+        <div class="card-body p-3 p-md-4">
             <form method="POST" action="{{ route('citizen.clamping.store') }}" enctype="multipart/form-data">
                 @csrf
-                
+
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-info-circle me-1"></i>Fields marked with <span class="text-danger">*</span> are required.
+                </p>
+
                 <!-- REQUESTER SECTION -->
-                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person-fill me-2"></i>Your Information</h6>
+                <div class="section-divider d-flex align-items-center gap-2">
+                    <span style="width: 2rem; height: 2rem; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 0.6rem; display: grid; place-items: center; color: #fff; font-size: 1rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                    <h5 class="mb-0 fw-bold text-primary">Your Information</h5>
+                </div>
                 <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Full Name *</label>
-                        <input type="text" name="requester_name" class="form-control @error('requester_name') is-invalid @enderror" value="{{ old('requester_name') }}" required>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" name="requester_name" class="form-control @error('requester_name') is-invalid @enderror" value="{{ old('requester_name') }}" placeholder="Juan Dela Cruz" required>
                         @error('requester_name')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Phone Number *</label>
-                        <input type="tel" name="requester_phone" class="form-control @error('requester_phone') is-invalid @enderror" value="{{ old('requester_phone') }}" required>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Phone Number <span class="text-danger">*</span></label>
+                        <input type="tel" name="requester_phone" class="form-control @error('requester_phone') is-invalid @enderror" value="{{ old('requester_phone') }}" placeholder="+639123456789" required>
                         @error('requester_phone')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Email Address *</label>
-                        <input type="email" name="requester_email" class="form-control @error('requester_email') is-invalid @enderror" value="{{ old('requester_email') }}" required>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" name="requester_email" class="form-control @error('requester_email') is-invalid @enderror" value="{{ old('requester_email') }}" placeholder="you@example.com" required>
                         @error('requester_email')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
                 </div>
 
                 <!-- LOCATION SECTION -->
-                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-geo-alt-fill me-2"></i>Location Details</h6>
+                <div class="section-divider d-flex align-items-center gap-2">
+                    <span style="width: 2rem; height: 2rem; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 0.6rem; display: grid; place-items: center; color: #fff; font-size: 1rem;">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+                    <h5 class="mb-0 fw-bold text-primary">Location Details</h5>
+                </div>
                 <div class="row g-3 mb-4">
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Address/Location *</label>
+                        <label class="form-label fw-semibold small">Address/Location <span class="text-danger">*</span></label>
                         <input type="text" name="location_address" class="form-control @error('location_address') is-invalid @enderror" placeholder="e.g., 123 Main St, Barangay Marikina" value="{{ old('location_address') }}" required>
                         @error('location_address')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Latitude *</label>
-                        <div class="input-group">
-                            <input type="number" step="0.000001" name="latitude" id="latitude" class="form-control @error('latitude') is-invalid @enderror" value="{{ old('latitude') }}" required readonly>
-                            <button type="button" class="btn btn-outline-primary" id="gpsButton" onclick="getGPSCoordinates()">
-                                <i class="bi bi-crosshair"></i> Get GPS
-                            </button>
-                        </div>
+                        <label class="form-label fw-semibold small">Latitude <span class="text-danger">*</span></label>
+                        <input type="number" step="0.000001" name="latitude" id="latitude" class="form-control @error('latitude') is-invalid @enderror" value="{{ old('latitude') }}" required readonly>
                         @error('latitude')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Longitude *</label>
+                        <label class="form-label fw-semibold small">Longitude <span class="text-danger">*</span></label>
                         <input type="number" step="0.000001" name="longitude" id="longitude" class="form-control @error('longitude') is-invalid @enderror" value="{{ old('longitude') }}" required readonly>
                         @error('longitude')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                    </div>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary w-100 fw-semibold" id="gpsButton" onclick="getGPSCoordinates()">
+                            <i class="bi bi-crosshair me-2"></i>Get Current Location
+                        </button>
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-info-circle me-1"></i>Coordinates will be auto-filled from your device GPS.
+                        </small>
                     </div>
                 </div>
 
                 <!-- VEHICLE SECTION -->
-                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-car-front-fill me-2"></i>Vehicle Information</h6>
+                <div class="section-divider d-flex align-items-center gap-2">
+                    <span style="width: 2rem; height: 2rem; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 0.6rem; display: grid; place-items: center; color: #fff; font-size: 1rem;">
+                        <i class="bi bi-car-front-fill"></i>
+                    </span>
+                    <h5 class="mb-0 fw-bold text-primary">Vehicle Information</h5>
+                </div>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">License Plate *</label>
+                        <label class="form-label fw-semibold small">License Plate <span class="text-danger">*</span></label>
                         <input type="text" name="vehicle_plate" class="form-control text-uppercase @error('vehicle_plate') is-invalid @enderror" placeholder="e.g., ABC 1234" value="{{ old('vehicle_plate') }}" required>
                         @error('vehicle_plate')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Vehicle Description</label>
+                        <label class="form-label fw-semibold small">Vehicle Description</label>
                         <input type="text" name="vehicle_description" class="form-control" placeholder="e.g., White Toyota Corolla" value="{{ old('vehicle_description') }}">
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Additional Notes</label>
-                        <textarea name="additional_notes" class="form-control" rows="3" placeholder="Any additional details...">{{ old('additional_notes') }}</textarea>
+                        <label class="form-label fw-semibold small">Additional Notes</label>
+                        <textarea name="additional_notes" class="form-control" rows="2" placeholder="Any additional details...">{{ old('additional_notes') }}</textarea>
                     </div>
                 </div>
 
                 <!-- EVIDENCE SECTION -->
-                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-camera-fill me-2"></i>Evidence</h6>
+                <div class="section-divider d-flex align-items-center gap-2">
+                    <span style="width: 2rem; height: 2rem; background: linear-gradient(135deg, #2563eb, #1e3a5f); border-radius: 0.6rem; display: grid; place-items: center; color: #fff; font-size: 1rem;">
+                        <i class="bi bi-camera-fill"></i>
+                    </span>
+                    <h5 class="mb-0 fw-bold text-primary">Evidence</h5>
+                </div>
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Photo of Vehicle *</label>
-                    <div class="position-relative">
-                        <input type="file" name="evidence_photo" class="form-control @error('evidence_photo') is-invalid @enderror" accept="image/*" required id="photoInput" onchange="previewPhoto(event)">
-                        <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Maximum 5MB. Clear photo showing license plate and parking violation.</small>
-                    </div>
+                    <label class="form-label fw-semibold small">Photo of Vehicle <span class="text-danger">*</span></label>
+                    <input type="file" name="evidence_photo" class="form-control @error('evidence_photo') is-invalid @enderror" accept="image/*" required id="photoInput" onchange="previewPhoto(event)">
+                    <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Max 5MB. Clear photo showing license plate and parking violation.</small>
                     @error('evidence_photo')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                     <div id="photoPreview" class="mt-3"></div>
                 </div>
 
                 <!-- SUBMISSION -->
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1 fw-semibold">
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 fw-semibold py-2">
                         <i class="bi bi-send me-2"></i>Submit Request
                     </button>
-                    <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary py-2">Cancel</a>
                 </div>
 
                 <p class="text-muted small mt-3 mb-0">
@@ -113,22 +162,21 @@
 function getGPSCoordinates() {
     const button = document.getElementById('gpsButton');
     button.disabled = true;
-    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Getting location...';
-    
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Getting location...';
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
                 document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
                 document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
                 button.disabled = false;
-                button.innerHTML = '<i class="bi bi-check-circle"></i> Location Set';
-                button.classList.add('btn-success');
-                button.classList.remove('btn-outline-primary');
+                button.innerHTML = '<i class="bi bi-check-circle me-2"></i>Location Set';
+                button.classList.replace('btn-primary', 'btn-success');
             },
             function(error) {
                 alert('Unable to get GPS coordinates: ' + error.message);
                 button.disabled = false;
-                button.innerHTML = '<i class="bi bi-crosshair"></i> Get GPS';
+                button.innerHTML = '<i class="bi bi-crosshair me-2"></i>Get Current Location';
             }
         );
     } else {
@@ -140,13 +188,13 @@ function getGPSCoordinates() {
 function previewPhoto(event) {
     const preview = document.getElementById('photoPreview');
     const file = event.target.files[0];
-    
+
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.innerHTML = `
-                <div style="position: relative; display: inline-block;">
-                    <img src="${e.target.result}" style="max-width: 250px; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div class="position-relative d-inline-block w-100">
+                    <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 300px; width: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <small class="text-muted d-block mt-2"><i class="bi bi-check-circle text-success me-1"></i>Photo selected</small>
                 </div>
             `;

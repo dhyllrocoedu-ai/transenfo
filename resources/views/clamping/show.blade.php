@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <h1 class="h3 mb-1">Clamp Notice {{ $clamping->notice_number }}</h1>
-        <p class="text-muted mb-0">Vehicle: {{ $clamping->vehicle->plate_number }}</p>
+        <p class="text-muted mb-0">Vehicle: {{ $clamping->vehicle_plate }}</p>
     </div>
     <span class="badge {{ $clamping->status->badgeClass() }} fs-6">{{ $clamping->status->label() }}</span>
 </div>

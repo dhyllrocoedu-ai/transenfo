@@ -12,7 +12,7 @@
                 @forelse ($records as $record)
                     <tr>
                         <td>{{ $record->notice_number }}</td>
-                        <td>{{ $record->vehicle->plate_number }}</td>
+                        <td>{{ $record->vehicle_plate }}</td>
                         <td>{{ $record->clamped_at->format('M d, Y') }}</td>
                         <td><span class="badge {{ $record->status->badgeClass() }}">{{ $record->status->label() }}</span></td>
                         <td>{{ $record->release?->release_number ?? '—' }}</td>

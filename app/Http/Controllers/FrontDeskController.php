@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Citation;
 use App\Models\ClampingRequest;
-use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,25 +20,18 @@ class FrontDeskController extends Controller
         $citationNumber = $request->input('citation_number');
 
         $citation = null;
-        $vehicle = null;
 
         if ($citationNumber) {
-            $citation = Citation::with(['vehicle', 'violationType', 'payment', 'driver'])
+            $citation = Citation::with(['violationType', 'payment'])
                 ->where('citation_number', $citationNumber)
                 ->first();
         } elseif ($plateNumber) {
-            $vehicle = Vehicle::with('owner')
-                ->where('plate_number', $plateNumber)
+            $citation = Citation::with(['violationType', 'payment'])
+                ->where('vehicle_plate', $plateNumber)
+                ->latest('issued_at')
                 ->first();
-
-            if ($vehicle) {
-                $citation = Citation::with(['violationType', 'payment'])
-                    ->where('vehicle_id', $vehicle->id)
-                    ->latest('issued_at')
-                    ->first();
-            }
         }
 
-        return view('frontdesk.index', compact('citation', 'vehicle', 'plateNumber', 'citationNumber'));
+        return view('frontdesk.index', compact('citation', 'plateNumber', 'citationNumber'));
     }
 }

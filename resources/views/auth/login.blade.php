@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="text-center mb-4 animate-on-load">
-    <div style="background: linear-gradient(135deg, #2563eb, #1e3a5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">LTEM</div>
+    <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="48" class="mb-2">
     <p class="text-muted mb-0">Land Transportation Enforcement Management</p>
 </div>
 
@@ -40,9 +40,12 @@
         <label class="form-check-label" for="remember">Remember me for 30 days</label>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold mb-3">
+    <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold mb-2">
         <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
     </button>
+    <div class="text-center mb-3">
+        <a href="{{ route('password.request') }}" class="text-decoration-none small">Forgot password?</a>
+    </div>
 
     <hr class="my-3">
 

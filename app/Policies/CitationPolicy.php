@@ -15,11 +15,7 @@ class CitationPolicy
 
     public function view(User $user, Citation $citation): bool
     {
-        if ($user->isStaff()) {
-            return true;
-        }
-
-        return $citation->vehicle?->owner_id === $user->id;
+        return true;
     }
 
     public function create(User $user): bool

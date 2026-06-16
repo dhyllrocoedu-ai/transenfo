@@ -17,7 +17,7 @@
         <hr>
         <div class="row mb-2"><div class="col-5 text-muted">Receipt #</div><div class="col-7 fw-semibold">{{ $payment->receipt_number }}</div></div>
         <div class="row mb-2"><div class="col-5 text-muted">Citation #</div><div class="col-7">{{ $payment->citation->citation_number }}</div></div>
-        <div class="row mb-2"><div class="col-5 text-muted">Vehicle</div><div class="col-7">{{ $payment->citation->vehicle->plate_number }}</div></div>
+        <div class="row mb-2"><div class="col-5 text-muted">Vehicle</div><div class="col-7">{{ $payment->citation->vehicle_plate }}</div></div>
         <div class="row mb-2"><div class="col-5 text-muted">Violation</div><div class="col-7">{{ $payment->citation->violationType->name }}</div></div>
         <div class="row mb-2"><div class="col-5 text-muted">Amount Paid</div><div class="col-7 fw-semibold">₱{{ number_format($payment->amount, 2) }}</div></div>
         <div class="row mb-2"><div class="col-5 text-muted">Payment Method</div><div class="col-7">{{ $payment->isOnlinePayment() ? ucfirst($payment->online_payment_method ?? 'Online Payment') : $payment->payment_method->label() }}</div></div>

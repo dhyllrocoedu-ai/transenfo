@@ -14,7 +14,7 @@ class StoreClampingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id' => ['required', 'exists:vehicles,id'],
+            'vehicle_plate' => ['required', 'string', 'max:20'],
             'location' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
             'evidence' => ['nullable', 'file', 'image', 'max:5120'],

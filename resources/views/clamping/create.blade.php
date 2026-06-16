@@ -8,13 +8,11 @@
     <form method="POST" action="{{ route('clamping.store') }}" enctype="multipart/form-data">@csrf
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label">Vehicle</label>
-                <select name="vehicle_id" class="form-select" required>
-                    <option value="">Select vehicle...</option>
-                    @foreach (App\Models\Vehicle::orderBy('plate_number')->get() as $v)
-                        <option value="{{ $v->id }}" @selected(old('vehicle_id', $vehicle?->id) == $v->id)>{{ $v->plate_number }}</option>
-                    @endforeach
-                </select>
+                <label class="form-label">Vehicle Plate</label>
+                <input type="text" name="vehicle_plate" class="form-control" value="{{ old('vehicle_plate', $citation->vehicle_plate ?? '') }}" placeholder="ABC-1234" required>
+                @if (isset($citation))
+                    <div class="small text-muted mt-1">Citation: {{ $citation->citation_number }} — {{ $citation->violationType->name }}</div>
+                @endif
             </div>
             <div class="col-md-6">
                 <label class="form-label">Location</label>

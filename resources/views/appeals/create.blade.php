@@ -19,7 +19,7 @@
                 <select name="citation_id" class="form-select" required>
                     <option value="">Select a citation</option>
                     @foreach ($citations as $citation)
-                        <option value="{{ $citation->id }}">{{ $citation->citation_number }} — {{ $citation->violationType->name }} ({{ $citation->vehicle->plate_number }})</option>
+                        <option value="{{ $citation->id }}">{{ $citation->citation_number }} — {{ $citation->violationType->name }} ({{ $citation->vehicle_plate }})</option>
                     @endforeach
                 </select>
             </div>

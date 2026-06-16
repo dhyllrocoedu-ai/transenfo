@@ -149,15 +149,15 @@
     </style>
 </head>
 <body>
-    <a href="{{ url('/') }}" class="btn btn-sm btn-outline-light position-fixed"
-       style="top: 1rem; left: 1rem; z-index: 100; border-radius: 2rem; backdrop-filter: blur(4px); background: rgba(255,255,255,0.1);">
-        <i class="bi bi-house-door"></i> Home
+    <a href="{{ route('welcome') }}" class="btn btn-sm btn-outline-light position-fixed"
+       style="top: 1rem; left: 1rem; z-index: 100; border-radius: 2rem; backdrop-filter: blur(4px); background: rgba(255,255,255,0.15);">
+        <i class="bi bi-house-door-fill me-1"></i>Home
     </a>
     <div class="account-container @if($showRegister) show-register @endif" id="accountContainer">
         <!-- Login Panel -->
         <div class="form-panel">
             <div class="text-center mb-4">
-                <div class="brand-icon">LT</div>
+                <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="48" class="mb-2">
                 <h4 class="mb-1">{{ config('itevcms.app_name') }}</h4>
                 <p class="text-muted small mb-0">Welcome back! Sign in to continue.</p>
             </div>
@@ -194,8 +194,11 @@
                 <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
                 </button>
+                <div class="text-center mt-2">
+                    <a href="{{ route('password.request') }}" class="text-decoration-none small">Forgot password?</a>
+                </div>
             </form>
-            <div class="text-center mt-3 mobile-toggle">
+            <div class="text-center mt-1 mobile-toggle">
                 <small class="text-muted">Don't have an account? <a href="#" onclick="toggleForm('register')" class="fw-semibold">Create one</a></small>
             </div>
         </div>
@@ -203,7 +206,7 @@
         <!-- Register Panel -->
         <div class="form-panel">
             <div class="text-center mb-4">
-                <div class="brand-icon">LT</div>
+                <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="48" class="mb-2">
                 <h4 class="mb-1">{{ config('itevcms.app_name') }}</h4>
                 <p class="text-muted small mb-0">Create your account to get started.</p>
             </div>

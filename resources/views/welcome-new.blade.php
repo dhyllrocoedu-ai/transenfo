@@ -349,7 +349,8 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" style="z-index: 100;">
     <div class="container-fluid px-4 px-lg-5">
-        <a class="navbar-brand fw-bold" href="/">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="32" class="me-2">
             <span style="background: linear-gradient(135deg, #1e3a5f, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">LTEM</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

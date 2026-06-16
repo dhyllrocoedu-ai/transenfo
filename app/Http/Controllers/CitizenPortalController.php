@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Citation;
 use App\Models\ClampingRequest;
-use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -23,10 +22,10 @@ class CitizenPortalController extends Controller
 
         $search = $request->input('search');
 
-        $citation = Citation::with(['violationType', 'vehicle', 'driver', 'evidence'])
+        $citation = Citation::with(['violationType', 'evidence'])
             ->where(function ($query) use ($search) {
                 $query->where('citation_number', 'like', "%{$search}%")
-                    ->orWhereHas('vehicle', fn ($v) => $v->where('plate_number', 'like', "%{$search}%"));
+                    ->orWhere('vehicle_plate', 'like', "%{$search}%");
             })
             ->first();
 
@@ -39,7 +38,7 @@ class CitizenPortalController extends Controller
 
     public function citationDetail(Citation $citation): View
     {
-        $citation->load(['violationType', 'vehicle', 'driver', 'evidence', 'payment']);
+        $citation->load(['violationType', 'evidence', 'payment']);
 
         return view('citizen.citation-detail', compact('citation'));
     }
@@ -64,13 +63,11 @@ class CitizenPortalController extends Controller
             'additional_notes' => 'nullable|string|max:1000',
         ]);
 
-        // Store evidence photo
         $photoPath = $request->file('evidence_photo')->store('clamping-requests', 'public');
         $data['evidence_photo'] = $photoPath;
         $data['status'] = 'pending';
 
-        // Create clamping request record
-        $request_data = ClampingRequest::create($data);
+        ClampingRequest::create($data);
 
         return view('citizen.clamping-success');
     }

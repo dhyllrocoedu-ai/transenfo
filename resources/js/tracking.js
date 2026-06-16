@@ -44,7 +44,7 @@ function initTrackingMap(options = {}) {
 
         const popup = new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(`
             <div style="font-weight:600">${enforcer.name}</div>
-            <div style="font-size:0.85rem;color:#666">${enforcer.status === 'active' ? '🟢 Active' : '⚪ Offline'}</div>
+            <div style="font-size:0.85rem;color:#666">${enforcer.status === 'active' ? '\u{1F7E2} Active' : '\u{26AA} Offline'}</div>
             <div style="font-size:0.85rem;color:#666">${enforcer.team || 'No team'}</div>
         `);
 
@@ -80,7 +80,7 @@ function initTrackingMap(options = {}) {
 
         const features = state.zones.map(zone => ({
             type: 'Feature',
-            properties: { name: zone.name, team: zone.team || '', radius: zone.radius_km },
+            properties: { name: zone.name, team: zone.team || '', radius: zone.radius_m },
             geometry: {
                 type: 'Point',
                 coordinates: [zone.center_lng, zone.center_lat],
@@ -97,7 +97,7 @@ function initTrackingMap(options = {}) {
             type: 'circle',
             source: 'zones',
             paint: {
-                'circle-radius': ['*', ['number', ['get', 'radius'], 1], 1000],
+                'circle-radius': ['number', ['get', 'radius'], 1],
                 'circle-color': 'rgba(37, 99, 235, 0.08)',
                 'circle-stroke-color': 'rgba(37, 99, 235, 0.25)',
                 'circle-stroke-width': 2,
@@ -109,7 +109,7 @@ function initTrackingMap(options = {}) {
             type: 'circle',
             source: 'zones',
             paint: {
-                'circle-radius': ['*', ['number', ['get', 'radius'], 1], 1000],
+                'circle-radius': ['number', ['get', 'radius'], 1],
                 'circle-color': 'transparent',
                 'circle-stroke-color': 'rgba(37, 99, 235, 0.4)',
                 'circle-stroke-width': 1,
@@ -137,13 +137,13 @@ function initTrackingMap(options = {}) {
                 <hr class="my-2">
                 <div class="small">
                     <div class="mb-1"><span class="text-muted">Status:</span> ${enforcer.status === 'active' ? 'Active' : 'Offline'}</div>
-                    <div class="mb-1"><span class="text-muted">Team:</span> ${enforcer.team || '—'}</div>
-                    <div class="mb-1"><span class="text-muted">Zone:</span> ${enforcer.zone_name || '—'} (${enforcer.distance_km || '?'} km)</div>
+                    <div class="mb-1"><span class="text-muted">Team:</span> ${enforcer.team || '\u2014'}</div>
+                    <div class="mb-1"><span class="text-muted">Zone:</span> ${enforcer.zone_name || '\u2014'} (${enforcer.distance_km || '?'} km)</div>
                     <div class="mb-1"><span class="text-muted">Inside Zone:</span> ${enforcer.inside_zone ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>'}</div>
                     <div class="mb-1"><span class="text-muted">Latitude:</span> <code>${enforcer.lat}</code></div>
                     <div class="mb-1"><span class="text-muted">Longitude:</span> <code>${enforcer.lng}</code></div>
-                    <div class="mb-1"><span class="text-muted">Accuracy:</span> ±${enforcer.accuracy_m || '?'}m</div>
-                    <div class="mb-1"><span class="text-muted">Last Seen:</span> ${enforcer.last_seen_label || '—'}</div>
+                    <div class="mb-1"><span class="text-muted">Accuracy:</span> \u00B1${enforcer.accuracy_m || '?'}m</div>
+                    <div class="mb-1"><span class="text-muted">Last Seen:</span> ${enforcer.last_seen_label || '\u2014'}</div>
                 </div>
             `;
         }
@@ -159,7 +159,7 @@ function initTrackingMap(options = {}) {
                     <span class="rounded-circle d-inline-block" style="width:10px;height:10px;background:${e.status === 'active' ? '#22c55e' : '#9ca3af'}"></span>
                     <span class="fw-semibold small">${e.name}</span>
                 </div>
-                <small class="text-muted">${e.zone_name || '—'}</small>
+                <small class="text-muted">${e.zone_name || '\u2014'}</small>
             </div>
         `).join('');
     }

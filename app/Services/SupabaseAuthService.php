@@ -90,4 +90,77 @@ class SupabaseAuthService
         request()->session()->invalidate();
         request()->session()->regenerateToken();
     }
+
+    public function sendPasswordResetLink(string $email): void
+    {
+        $redirectTo = route('password.reset', [], true);
+
+        $response = Http::withHeaders([
+            'apikey' => config('supabase.anon_key'),
+            'Content-Type' => 'application/json',
+        ])->post(config('supabase.url').'/auth/v1/recover', [
+            'email' => $email,
+            'redirect_to' => $redirectTo,
+        ]);
+
+        if (! $response->successful()) {
+            throw ValidationException::withMessages([
+                'email' => ['Failed to send password reset email. Please try again.'],
+            ]);
+        }
+    }
+
+    public function signupWithVerification(string $name, string $email, string $password): string
+    {
+        $redirectTo = config('app.url').'/email/verify/callback';
+
+        $response = Http::withHeaders([
+            'apikey' => config('supabase.anon_key'),
+            'Content-Type' => 'application/json',
+        ])->post(config('supabase.url').'/auth/v1/signup', [
+            'email' => $email,
+            'password' => $password,
+            'data' => ['name' => $name],
+            'redirect_to' => $redirectTo,
+        ]);
+
+        if (! $response->successful()) {
+            throw ValidationException::withMessages([
+                'email' => ['Failed to create account. Please try again.'],
+            ]);
+        }
+
+        return $response->json('id');
+    }
+
+    public function verifyEmailViaSupabase(string $accessToken): ?string
+    {
+        $response = Http::withHeaders([
+            'apikey' => config('supabase.anon_key'),
+            'Authorization' => 'Bearer '.$accessToken,
+        ])->get(config('supabase.url').'/auth/v1/user');
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        return $response->json('id');
+    }
+
+    public function updatePasswordViaSupabase(string $accessToken, string $newPassword): void
+    {
+        $response = Http::withHeaders([
+            'apikey' => config('supabase.anon_key'),
+            'Authorization' => 'Bearer '.$accessToken,
+            'Content-Type' => 'application/json',
+        ])->put(config('supabase.url').'/auth/v1/user', [
+            'password' => $newPassword,
+        ]);
+
+        if (! $response->successful()) {
+            throw ValidationException::withMessages([
+                'password' => ['Failed to reset password. The link may have expired.'],
+            ]);
+        }
+    }
 }

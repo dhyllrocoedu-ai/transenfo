@@ -15,11 +15,7 @@ class PaymentPolicy
 
     public function view(User $user, Payment $payment): bool
     {
-        if ($user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier)) {
-            return true;
-        }
-
-        return $payment->citation?->vehicle?->owner_id === $user->id;
+        return $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier);
     }
 
     public function create(User $user): bool

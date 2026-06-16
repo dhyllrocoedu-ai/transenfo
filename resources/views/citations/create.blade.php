@@ -8,24 +8,32 @@
     <form method="POST" action="{{ route('citations.store') }}" enctype="multipart/form-data">@csrf
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label">Vehicle</label>
-                <select name="vehicle_id" class="form-select" required>
-                    <option value="">Select vehicle...</option>
-                    @foreach ($vehicles as $vehicle)
-                        <option value="{{ $vehicle->id }}" @selected(old('vehicle_id', $selectedVehicle?->id) == $vehicle->id)>
-                            {{ $vehicle->plate_number }} — {{ $vehicle->classification }}
-                        </option>
-                    @endforeach
-                </select>
+                <label class="form-label">Vehicle Plate <span class="text-danger">*</span></label>
+                <input type="text" name="vehicle_plate" class="form-control" value="{{ old('vehicle_plate') }}" placeholder="ABC-1234" required>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Driver (optional)</label>
-                <select name="driver_id" class="form-select">
-                    <option value="">— None —</option>
-                    @foreach ($drivers as $driver)
-                        <option value="{{ $driver->id }}" @selected(old('driver_id') == $driver->id)>{{ $driver->fullName() }} ({{ $driver->license_number }})</option>
-                    @endforeach
-                </select>
+                <label class="form-label">Vehicle Make</label>
+                <input type="text" name="vehicle_make" class="form-control" value="{{ old('vehicle_make') }}" placeholder="e.g. Toyota">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Vehicle Model</label>
+                <input type="text" name="vehicle_model" class="form-control" value="{{ old('vehicle_model') }}" placeholder="e.g. Vios">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Vehicle Type</label>
+                <input type="text" name="vehicle_type" class="form-control" value="{{ old('vehicle_type') }}" placeholder="e.g. Sedan, SUV">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Vehicle Color</label>
+                <input type="text" name="vehicle_color" class="form-control" value="{{ old('vehicle_color') }}" placeholder="e.g. Red">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Driver Name</label>
+                <input type="text" name="driver_name" class="form-control" value="{{ old('driver_name') }}" placeholder="Driver's full name">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Driver License</label>
+                <input type="text" name="driver_license" class="form-control" value="{{ old('driver_license') }}" placeholder="License number">
             </div>
             <div class="col-md-6">
                 <label class="form-label">Violation Type</label>

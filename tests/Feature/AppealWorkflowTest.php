@@ -5,9 +5,7 @@ namespace Tests\Feature;
 use App\Enums\CitationStatus;
 use App\Enums\Role;
 use App\Models\Citation;
-use App\Models\Driver;
 use App\Models\User;
-use App\Models\Vehicle;
 use App\Models\ViolationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,20 +24,6 @@ class AppealWorkflowTest extends TestCase
             'is_active' => true,
         ]);
 
-        $driver = Driver::create([
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'license_number' => 'LIC-1001',
-        ]);
-
-        $vehicle = Vehicle::create([
-            'owner_id' => $owner->id,
-            'driver_id' => $driver->id,
-            'plate_number' => 'ABC123',
-            'classification' => 'Sedan',
-            'registration_status' => 'active',
-        ]);
-
         $violationType = ViolationType::create([
             'code' => 'OVR-001',
             'name' => 'Illegal Parking',
@@ -50,8 +34,7 @@ class AppealWorkflowTest extends TestCase
         $citation = Citation::create([
             'citation_number' => 'CIT-1001',
             'violation_type_id' => $violationType->id,
-            'driver_id' => $driver->id,
-            'vehicle_id' => $vehicle->id,
+            'vehicle_plate' => 'ABC123',
             'issued_by' => $owner->id,
             'penalty_amount' => 2500,
             'status' => CitationStatus::Issued,
@@ -92,20 +75,6 @@ class AppealWorkflowTest extends TestCase
             'is_active' => true,
         ]);
 
-        $driver = Driver::create([
-            'first_name' => 'John',
-            'last_name' => 'Smith',
-            'license_number' => 'LIC-1002',
-        ]);
-
-        $vehicle = Vehicle::create([
-            'owner_id' => $owner->id,
-            'driver_id' => $driver->id,
-            'plate_number' => 'XYZ999',
-            'classification' => 'SUV',
-            'registration_status' => 'active',
-        ]);
-
         $violationType = ViolationType::create([
             'code' => 'OVR-002',
             'name' => 'Broken Signal',
@@ -116,8 +85,7 @@ class AppealWorkflowTest extends TestCase
         $citation = Citation::create([
             'citation_number' => 'CIT-1002',
             'violation_type_id' => $violationType->id,
-            'driver_id' => $driver->id,
-            'vehicle_id' => $vehicle->id,
+            'vehicle_plate' => 'XYZ999',
             'issued_by' => $staff->id,
             'penalty_amount' => 3500,
             'status' => CitationStatus::Issued,

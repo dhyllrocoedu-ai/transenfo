@@ -23,7 +23,7 @@
         <div class="card stat-card"><div class="card-body">
             <h5 class="mb-3">Citation: {{ $citation->citation_number }}</h5>
             <p class="mb-1"><strong>Violation:</strong> {{ $citation->violationType->name }}</p>
-            <p class="mb-1"><strong>Vehicle:</strong> {{ $citation->vehicle->plate_number }}</p>
+            <p class="mb-1"><strong>Vehicle:</strong> {{ $citation->vehicle_plate }}</p>
             <p class="mb-4"><strong>Amount Due:</strong> ₱{{ number_format($citation->penalty_amount, 2) }}</p>
 
             <form method="POST" action="{{ route('payments.store') }}">@csrf

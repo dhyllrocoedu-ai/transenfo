@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -18,8 +17,6 @@ class Citation extends Model
     protected $fillable = [
         'citation_number',
         'violation_type_id',
-        'driver_id',
-        'vehicle_id',
         'issued_by',
         'penalty_amount',
         'status',
@@ -27,6 +24,13 @@ class Citation extends Model
         'notes',
         'issued_at',
         'due_date',
+        'vehicle_plate',
+        'vehicle_make',
+        'vehicle_model',
+        'vehicle_type',
+        'vehicle_color',
+        'driver_name',
+        'driver_license',
     ];
 
     protected function casts(): array
@@ -42,16 +46,6 @@ class Citation extends Model
     public function violationType(): BelongsTo
     {
         return $this->belongsTo(ViolationType::class);
-    }
-
-    public function driver(): BelongsTo
-    {
-        return $this->belongsTo(Driver::class);
-    }
-
-    public function vehicle(): BelongsTo
-    {
-        return $this->belongsTo(Vehicle::class);
     }
 
     public function enforcer(): BelongsTo
@@ -84,19 +78,9 @@ class Citation extends Model
             || $this->status === CitationStatus::Released;
     }
 
-    public function getQRCode(): string
-    {
-        $url = route('citizen.citation.detail', $this, false);
-
-        return QrCode::size(150)
-            ->margin(1)
-            ->errorCorrection('M')
-            ->generate($url);
-    }
-
     public function getQRCodeUrl(): string
     {
-        $data = "Citation: {$this->citation_number} | Vehicle: {$this->vehicle->plate_number} | Amount: ₱{$this->penalty_amount}";
+        $data = "Citation: {$this->citation_number} | Vehicle: {$this->vehicle_plate} | Amount: ₱{$this->penalty_amount}";
         $encoded = urlencode($data);
 
         return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={$encoded}";
@@ -110,4 +94,3 @@ class Citation extends Model
             ->dontSubmitEmptyLogs();
     }
 }
-

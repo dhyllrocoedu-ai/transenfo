@@ -19,8 +19,6 @@ class PayMongoController extends Controller
 
         if ($user->isStaff()) {
             $this->authorize('create', Payment::class);
-        } else {
-            abort_unless($citation->vehicle?->owner_id === $user->id, 403);
         }
 
         if ($citation->payment) {
@@ -48,7 +46,7 @@ class PayMongoController extends Controller
 
         try {
             $session = $payMongo->createCheckoutSession([
-                'billing_name' => $citation->driver?->fullName() ?? auth()->user()->name,
+                'billing_name' => $citation->driver_name ?? auth()->user()->name,
                 'billing_email' => auth()->user()->email,
                 'billing_phone' => auth()->user()->phone,
                 'amount' => $citation->penalty_amount,

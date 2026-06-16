@@ -10,7 +10,6 @@ use App\Models\Appeal;
 use App\Models\Citation;
 use App\Models\ClampingRecord;
 use App\Models\Payment;
-use App\Models\Vehicle;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -49,7 +48,7 @@ class DashboardController extends Controller
             ->map(fn ($group) => $group->sum('amount'))
             ->sortKeys();
 
-        $recentCitations = Citation::with(['vehicle', 'violationType', 'driver'])
+        $recentCitations = Citation::with(['violationType'])
             ->latest('issued_at')
             ->take(5)
             ->get();
@@ -64,7 +63,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $activeClampRecords = ClampingRecord::with('vehicle')
+        $activeClampRecords = ClampingRecord::with('citation')
             ->where('status', ClampingStatus::Active)
             ->latest('clamped_at')
             ->take(5)
@@ -75,7 +74,7 @@ class DashboardController extends Controller
                 'type' => 'citation',
                 'icon' => 'bi-receipt',
                 'title' => 'Citation issued',
-                'description' => $citation->driver?->fullName().' • '.$citation->citation_number,
+                'description' => $citation->driver_name.' • '.$citation->citation_number,
                 'timestamp' => $citation->issued_at,
                 'timestamp_label' => $citation->issued_at?->diffForHumans(),
             ]),
@@ -99,7 +98,7 @@ class DashboardController extends Controller
                 'type' => 'clamp',
                 'icon' => 'bi-lock',
                 'title' => 'Vehicle clamped',
-                'description' => $clamp->vehicle?->plate_number ?? 'Clamp record updated',
+                'description' => $clamp->vehicle_plate,
                 'timestamp' => $clamp->clamped_at,
                 'timestamp_label' => $clamp->clamped_at?->diffForHumans(),
             ]),
@@ -119,21 +118,18 @@ class DashboardController extends Controller
 
     protected function ownerDashboard($user): View
     {
-        $vehicleIds = Vehicle::where('owner_id', $user->id)->pluck('id');
-
         $stats = [
-            'my_vehicles' => $vehicleIds->count(),
-            'my_citations' => Citation::whereIn('vehicle_id', $vehicleIds)->count(),
-            'unpaid' => Citation::whereIn('vehicle_id', $vehicleIds)
+            'my_citations' => Citation::where('issued_by', $user->id)->count(),
+            'unpaid' => Citation::where('issued_by', $user->id)
                 ->whereIn('status', [CitationStatus::Issued, CitationStatus::Overdue, CitationStatus::Clamped])
                 ->count(),
-            'active_clamps' => ClampingRecord::whereIn('vehicle_id', $vehicleIds)
+            'active_clamps' => ClampingRecord::where('clamped_by', $user->id)
                 ->where('status', ClampingStatus::Active)
                 ->count(),
         ];
 
-        $recentCitations = Citation::with(['violationType', 'vehicle'])
-            ->whereIn('vehicle_id', $vehicleIds)
+        $recentCitations = Citation::with(['violationType'])
+            ->where('issued_by', $user->id)
             ->latest('issued_at')
             ->limit(5)
             ->get();

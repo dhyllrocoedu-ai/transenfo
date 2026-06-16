@@ -42,7 +42,7 @@
                     <tr>
                         <td>{{ $citation->citation_number }}</td>
                         <td>{{ $citation->violationType->name }}</td>
-                        <td>{{ $citation->vehicle->plate_number }}</td>
+                        <td>{{ $citation->vehicle_plate }}</td>
                         <td>₱{{ number_format($citation->penalty_amount, 2) }}</td>
                         <td>{{ $citation->issued_at->format('M d, Y') }}</td>
                         <td><span class="badge {{ $citation->status->badgeClass() }}">{{ $citation->status->label() }}</span></td>
