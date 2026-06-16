@@ -68,6 +68,18 @@ function initTrackingMap(options = {}) {
         });
     }
 
+    function buildCirclePolygon(lng, lat, radiusM, points = 64) {
+        const radiusDeg = radiusM / 111320;
+        const coords = [];
+        for (let i = 0; i <= points; i++) {
+            const angle = (i / points) * 2 * Math.PI;
+            const dx = radiusDeg * Math.cos(angle) / Math.cos(lat * Math.PI / 180);
+            const dy = radiusDeg * Math.sin(angle);
+            coords.push([lng + dx, lat + dy]);
+        }
+        return coords;
+    }
+
     function renderZones() {
         const existing = map.getSource('zones');
         if (existing) {
@@ -78,14 +90,20 @@ function initTrackingMap(options = {}) {
 
         if (state.zones.length === 0) return;
 
-        const features = state.zones.map(zone => ({
-            type: 'Feature',
-            properties: { name: zone.name, team: zone.team || '', radius: zone.radius_m },
-            geometry: {
-                type: 'Point',
-                coordinates: [zone.center_lng, zone.center_lat],
-            },
-        }));
+        const features = state.zones.map(zone => {
+            const lng = parseFloat(zone.center_lng);
+            const lat = parseFloat(zone.center_lat);
+            const radius = parseFloat(zone.radius_m);
+            if (isNaN(lng) || isNaN(lat) || isNaN(radius)) return null;
+            return {
+                type: 'Feature',
+                properties: { name: zone.name, team: zone.team || '' },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [buildCirclePolygon(lng, lat, radius)],
+                },
+            };
+        }).filter(Boolean);
 
         map.addSource('zones', {
             type: 'geojson',
@@ -94,26 +112,23 @@ function initTrackingMap(options = {}) {
 
         map.addLayer({
             id: 'zones-fill',
-            type: 'circle',
+            type: 'fill',
             source: 'zones',
             paint: {
-                'circle-radius': ['number', ['get', 'radius'], 1],
-                'circle-color': 'rgba(37, 99, 235, 0.08)',
-                'circle-stroke-color': 'rgba(37, 99, 235, 0.25)',
-                'circle-stroke-width': 2,
+                'fill-color': 'rgba(37, 99, 235, 0.08)',
+                'fill-outline-color': 'rgba(37, 99, 235, 0.25)',
             },
         });
 
         map.addLayer({
             id: 'zones-outline',
-            type: 'circle',
+            type: 'line',
             source: 'zones',
             paint: {
-                'circle-radius': ['number', ['get', 'radius'], 1],
-                'circle-color': 'transparent',
-                'circle-stroke-color': 'rgba(37, 99, 235, 0.4)',
-                'circle-stroke-width': 1,
-                'circle-opacity': 0.6,
+                'line-color': 'rgba(37, 99, 235, 0.4)',
+                'line-width': 1,
+                'line-opacity': 0.6,
+                'line-dasharray': [3, 2],
             },
         });
     }

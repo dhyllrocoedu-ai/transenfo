@@ -41,6 +41,11 @@ class ClampingRequest extends Model
         return $this->belongsTo(User::class, 'processed_by');
     }
 
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
     public function clampingRecord(): BelongsTo
     {
         return $this->belongsTo(ClampingRecord::class);

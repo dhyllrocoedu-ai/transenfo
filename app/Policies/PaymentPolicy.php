@@ -10,7 +10,7 @@ class PaymentPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isStaff() || $user->isRole(Role::VehicleOwner);
+        return $user->isStaff();
     }
 
     public function view(User $user, Payment $payment): bool
@@ -20,6 +20,11 @@ class PaymentPolicy
 
     public function create(User $user): bool
     {
-        return $user->isStaff();
+        return $user->isRole(Role::Cashier);
+    }
+
+    public function update(User $user, Payment $payment): bool
+    {
+        return $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier);
     }
 }

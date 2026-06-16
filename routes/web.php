@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CitizenPortalController;
 use App\Http\Controllers\ClampingController;
+use App\Http\Controllers\ClampingRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontDeskController;
 use App\Http\Controllers\NotificationController;
@@ -72,11 +73,19 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('citations', CitationController::class)->only(['index', 'create', 'store', 'show']);
-    Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::resource('clamping', ClampingController::class)->only(['index', 'create', 'store', 'show']);
+    Route::prefix('clamping-requests')->name('clamping-requests.')->controller(ClampingRequestController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{clampingRequest}', 'show')->name('show');
+        Route::post('{clampingRequest}/approve', 'approve')->name('approve');
+        Route::post('{clampingRequest}/reject', 'reject')->name('reject');
+        Route::post('{clampingRequest}/assign', 'assign')->name('assign');
+        Route::post('{clampingRequest}/resolve', 'resolve')->name('resolve');
+    });
     Route::resource('appeals', AppealController::class);
     Route::resource('teams', TeamController::class);
-    Route::post('teams/{team}/zones/{zone}/toggle', [TeamController::class, 'toggleZone'])->name('teams.zones.toggle');
+    Route::post('teams/{team}/zones/toggle', [TeamController::class, 'toggleZone'])->name('teams.zones.toggle');
     Route::resource('zones', ZoneController::class);
     Route::get('tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('tracking/locations', [TrackingController::class, 'locations'])->name('tracking.locations');

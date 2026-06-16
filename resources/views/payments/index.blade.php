@@ -33,7 +33,12 @@
                         <td>₱{{ number_format($payment->amount, 2) }}</td>
                         <td>{{ $payment->payment_method->label() }}</td>
                         <td>{{ $payment->paid_at->format('M d, Y') }}</td>
-                        <td class="text-end"><a href="{{ route('payments.show', $payment) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                        <td class="text-end">
+                            <a href="{{ route('payments.show', $payment) }}" class="btn btn-sm btn-outline-primary">View</a>
+                            @can('update', $payment)
+                                <a href="{{ route('payments.edit', $payment) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            @endcan
+                        </td>
                     </tr>
                 @empty
                     <tr><td colspan="7" class="text-center text-muted py-4">No payments recorded.</td></tr>

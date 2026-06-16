@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany(DeviceManager::class);
     }
 
+    public function assignedClampingRequests(): HasMany
+    {
+        return $this->hasMany(ClampingRequest::class, 'assigned_to');
+    }
+
     public function notifications(): HasMany
     {
         return $this->hasMany(SystemNotification::class, 'user_id');

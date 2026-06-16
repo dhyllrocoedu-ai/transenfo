@@ -19,11 +19,7 @@ class PaymentController extends Controller
     {
         $this->authorize('viewAny', Payment::class);
 
-        $query = Payment::with(['citation.vehicle', 'cashier'])->whereNotNull('paid_at');
-
-        if (! auth()->user()->isStaff()) {
-            $query->whereHas('citation.vehicle', fn ($q) => $q->where('owner_id', auth()->id()));
-        }
+        $query = Payment::with(['citation', 'cashier'])->whereNotNull('paid_at');
 
         $payments = $query->latest('paid_at')->paginate(15);
 
@@ -36,11 +32,11 @@ class PaymentController extends Controller
 
         $citation = null;
         if ($request->filled('citation_number')) {
-            $citation = Citation::with(['violationType', 'vehicle', 'payment'])
+            $citation = Citation::with(['violationType', 'payment'])
                 ->where('citation_number', $request->citation_number)
                 ->first();
         } elseif ($request->filled('citation_id')) {
-            $citation = Citation::with(['violationType', 'vehicle', 'payment'])->find($request->citation_id);
+            $citation = Citation::with(['violationType', 'payment'])->find($request->citation_id);
         }
 
         return view('payments.create', [
@@ -83,11 +79,38 @@ class PaymentController extends Controller
         return redirect()->route('payments.show', $payment)->with('success', 'Payment recorded successfully.');
     }
 
+    public function edit(Payment $payment): View
+    {
+        $this->authorize('update', $payment);
+
+        $payment->load(['citation.violationType', 'cashier']);
+
+        return view('payments.edit', [
+            'payment' => $payment,
+            'paymentMethods' => PaymentMethod::cases(),
+        ]);
+    }
+
+    public function update(Request $request, Payment $payment): RedirectResponse
+    {
+        $this->authorize('update', $payment);
+
+        $validated = $request->validate([
+            'payment_method' => 'required|string',
+            'reference_number' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $payment->update($validated);
+
+        return redirect()->route('payments.show', $payment)->with('success', 'Payment updated successfully.');
+    }
+
     public function show(Payment $payment): View
     {
         $this->authorize('view', $payment);
 
-        $payment->load(['citation.violationType', 'citation.vehicle', 'cashier']);
+        $payment->load(['citation.violationType', 'cashier']);
 
         return view('payments.show', compact('payment'));
     }

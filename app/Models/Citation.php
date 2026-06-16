@@ -63,6 +63,11 @@ class Citation extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function clampingRecords(): HasMany
+    {
+        return $this->hasMany(ClampingRecord::class);
+    }
+
     public function isPayable(): bool
     {
         return in_array($this->status, [

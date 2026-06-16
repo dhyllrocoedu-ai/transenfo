@@ -84,9 +84,11 @@ class TeamController extends Controller
         return redirect()->route('teams.index')->with('success', 'Team updated successfully.');
     }
 
-    public function toggleZone(Request $request, Team $team, Zone $zone): JsonResponse
+    public function toggleZone(Request $request, Team $team): JsonResponse
     {
         $this->authorizeAdmin();
+
+        $zone = Zone::findOrFail($request->integer('zone_id'));
 
         $assigned = $request->boolean('assigned');
         if ($assigned) {
