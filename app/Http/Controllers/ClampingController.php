@@ -61,7 +61,7 @@ class ClampingController extends Controller
         $this->authorize('create', ClampingRecord::class);
 
         $existingClamp = ClampingRecord::where('vehicle_plate', $request->vehicle_plate)
-            ->where('status', ClampingStatus::Active)
+            ->where('status', ClampingStatus::AwaitingPayment)
             ->exists();
 
         if ($existingClamp) {
@@ -83,7 +83,7 @@ class ClampingController extends Controller
             'vehicle_plate' => $request->vehicle_plate,
             'citation_id' => $citation?->id,
             'clamped_by' => auth()->id(),
-            'status' => ClampingStatus::Active,
+            'status' => ClampingStatus::AwaitingPayment,
             'location' => $request->location,
             'notes' => $request->notes,
             'evidence_path' => $evidencePath,

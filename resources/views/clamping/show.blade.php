@@ -32,10 +32,10 @@
         </div>
     </div>
     <div class="col-lg-4">
-        @if ($clamping->isActive() && auth()->user()->isRole(App\Enums\Role::SuperAdmin, App\Enums\Role::Administrator, App\Enums\Role::ClampingOfficer))
+        @if (in_array($clamping->status, [App\Enums\ClampingStatus::AwaitingPayment, App\Enums\ClampingStatus::Paid, App\Enums\ClampingStatus::WaitingRelease]))
             <div class="card stat-card">
                 <div class="card-body">
-                    <a href="{{ route('releases.create', $clamping) }}" class="btn btn-success w-100">Process Release</a>
+                    <a href="{{ route('impounding.show', $clamping) }}" class="btn btn-primary w-100">View in Impounding</a>
                 </div>
             </div>
         @elseif ($clamping->release)
@@ -44,6 +44,14 @@
                 <div class="card-body">
                     <p class="mb-1">{{ $clamping->release->release_number }}</p>
                     <p class="mb-0 text-muted small">{{ $clamping->release->released_at->format('M d, Y') }}</p>
+                </div>
+            </div>
+        @elseif ($clamping->status === App\Enums\ClampingStatus::Released)
+            <div class="card stat-card">
+                <div class="card-header bg-white"><strong>Release</strong></div>
+                <div class="card-body">
+                    <p class="mb-1">{{ $clamping->release?->release_number ?? 'Released' }}</p>
+                    <p class="mb-0 text-muted small">{{ $clamping->release?->released_at?->format('M d, Y') ?? '—' }}</p>
                 </div>
             </div>
         @endif

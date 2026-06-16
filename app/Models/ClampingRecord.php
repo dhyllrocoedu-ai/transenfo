@@ -42,9 +42,14 @@ class ClampingRecord extends Model
         return $this->belongsTo(User::class, 'clamped_by');
     }
 
+    public function release(): HasOne
+    {
+        return $this->hasOne(VehicleRelease::class, 'clamping_record_id');
+    }
+
     public function isActive(): bool
     {
-        return $this->status === ClampingStatus::Active;
+        return $this->status === ClampingStatus::AwaitingPayment;
     }
 
     public function getActivitylogOptions(): LogOptions

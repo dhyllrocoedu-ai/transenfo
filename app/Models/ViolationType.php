@@ -13,6 +13,7 @@ class ViolationType extends Model
         'description',
         'penalty_amount',
         'is_active',
+        'is_impoundable',
     ];
 
     protected function casts(): array
@@ -20,6 +21,7 @@ class ViolationType extends Model
         return [
             'penalty_amount' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_impoundable' => 'boolean',
         ];
     }
 

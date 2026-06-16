@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ClampingStatus;
 use App\Enums\Role;
 use App\Models\ClampingRecord;
 use App\Models\User;
@@ -25,5 +26,29 @@ class ClampingPolicy
             Role::Administrator,
             Role::ClampingOfficer
         );
+    }
+
+    public function markPaid(User $user, ClampingRecord $clampingRecord): bool
+    {
+        if (! $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier)) {
+            return false;
+        }
+        return $clampingRecord->status === ClampingStatus::AwaitingPayment;
+    }
+
+    public function markWaitingRelease(User $user, ClampingRecord $clampingRecord): bool
+    {
+        if (! $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier)) {
+            return false;
+        }
+        return $clampingRecord->status === ClampingStatus::Paid;
+    }
+
+    public function processRelease(User $user, ClampingRecord $clampingRecord): bool
+    {
+        if (! $user->isRole(Role::SuperAdmin, Role::Administrator, Role::FrontDesk)) {
+            return false;
+        }
+        return $clampingRecord->status === ClampingStatus::WaitingRelease;
     }
 }

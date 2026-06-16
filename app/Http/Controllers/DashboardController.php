@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 CitationStatus::Clamped,
             ])->count(),
             'payments_today' => Payment::whereDate('paid_at', today())->sum('amount'),
-            'active_clamps' => ClampingRecord::where('status', ClampingStatus::Active)->count(),
+            'active_clamps' => ClampingRecord::where('status', ClampingStatus::AwaitingPayment)->count(),
             'pending_appeals' => Appeal::whereIn('status', [AppealStatus::Submitted, AppealStatus::UnderReview])->count(),
         ];
 
@@ -64,7 +64,7 @@ class DashboardController extends Controller
             ->get();
 
         $activeClampRecords = ClampingRecord::with('citation')
-            ->where('status', ClampingStatus::Active)
+            ->where('status', ClampingStatus::AwaitingPayment)
             ->latest('clamped_at')
             ->take(5)
             ->get();
@@ -124,7 +124,7 @@ class DashboardController extends Controller
                 ->whereIn('status', [CitationStatus::Issued, CitationStatus::Overdue, CitationStatus::Clamped])
                 ->count(),
             'active_clamps' => ClampingRecord::where('clamped_by', $user->id)
-                ->where('status', ClampingStatus::Active)
+                ->where('status', ClampingStatus::AwaitingPayment)
                 ->count(),
         ];
 

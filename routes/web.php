@@ -11,6 +11,7 @@ use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CitizenPortalController;
 use App\Http\Controllers\ClampingController;
 use App\Http\Controllers\ClampingRequestController;
+use App\Http\Controllers\ImpoundingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontDeskController;
 use App\Http\Controllers\NotificationController;
@@ -83,6 +84,14 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
         Route::post('{clampingRequest}/assign', 'assign')->name('assign');
         Route::post('{clampingRequest}/resolve', 'resolve')->name('resolve');
     });
+    Route::prefix('impounding')->name('impounding.')->controller(ImpoundingController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{clamping}', 'show')->name('show');
+        Route::post('{clamping}/mark-paid', 'markPaid')->name('mark-paid');
+        Route::post('{clamping}/mark-waiting-release', 'markWaitingRelease')->name('mark-waiting-release');
+        Route::post('{clamping}/process-release', 'processRelease')->name('process-release');
+    });
+
     Route::resource('appeals', AppealController::class);
     Route::resource('teams', TeamController::class);
     Route::post('teams/{team}/zones/toggle', [TeamController::class, 'toggleZone'])->name('teams.zones.toggle');

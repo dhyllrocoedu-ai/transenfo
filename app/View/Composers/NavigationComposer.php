@@ -52,6 +52,10 @@ class NavigationComposer
                 $operations[] = ['label' => 'Clamping', 'route' => 'clamping.index', 'icon' => 'lock'];
             }
 
+            if ($user->isRole(Role::SuperAdmin, Role::Administrator, Role::ClampingOfficer, Role::Cashier, Role::FrontDesk)) {
+                $operations[] = ['label' => 'Impounding', 'route' => 'impounding.index', 'icon' => 'truck'];
+            }
+
             if ($user->isRole(Role::SuperAdmin, Role::Administrator, Role::ClampingOfficer, Role::Enforcer)) {
                 $operations[] = ['label' => 'Clamping Requests', 'route' => 'clamping-requests.index', 'icon' => 'inbox'];
             }

@@ -14,7 +14,7 @@
     #location-map {
         width: 100%;
         aspect-ratio: 4 / 3;
-        min-height: 260px;
+        min-height: 240px;
         border-radius: 0.5rem;
     }
     .section-icon {
@@ -50,21 +50,20 @@
             <i class="bi bi-info-circle me-1"></i>Fields marked with <span class="text-danger">*</span> are required.
         </p>
 
-        <div class="row g-4">
+        <div class="row g-4 mb-4">
             <div class="col-lg-7">
                 <div class="card stat-card h-100">
                     <div class="card-body p-3 p-md-4">
-
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="section-icon"><i class="bi bi-person-fill"></i></span>
                             <h5 class="mb-0 fw-bold text-primary">Your Information</h5>
                         </div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-12">
-                                <label class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="requester_name" class="form-control @error('requester_name') is-invalid @enderror" value="{{ old('requester_name') }}" placeholder="Juan Dela Cruz" required>
-                                @error('requester_name')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="requester_name" class="form-control @error('requester_name') is-invalid @enderror" value="{{ old('requester_name') }}" placeholder="Juan Dela Cruz" required>
+                            @error('requester_name')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                        </div>
+                        <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold small">Phone Number <span class="text-danger">*</span></label>
                                 <input type="tel" name="requester_phone" class="form-control @error('requester_phone') is-invalid @enderror" value="{{ old('requester_phone') }}" placeholder="+639123456789" required>
@@ -76,48 +75,12 @@
                                 @error('requester_email')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                             </div>
                         </div>
-
-                        <hr class="my-4">
-
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="section-icon"><i class="bi bi-car-front-fill"></i></span>
-                            <h5 class="mb-0 fw-bold text-primary">Vehicle Information</h5>
-                        </div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold small">License Plate <span class="text-danger">*</span></label>
-                                <input type="text" name="vehicle_plate" class="form-control text-uppercase @error('vehicle_plate') is-invalid @enderror" placeholder="e.g., ABC 1234" value="{{ old('vehicle_plate') }}" required>
-                                @error('vehicle_plate')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold small">Vehicle Description</label>
-                                <input type="text" name="vehicle_description" class="form-control" placeholder="e.g., White Toyota Corolla" value="{{ old('vehicle_description') }}">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold small">Additional Notes</label>
-                                <textarea name="additional_notes" class="form-control" rows="2" placeholder="Any additional details...">{{ old('additional_notes') }}</textarea>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="section-icon"><i class="bi bi-camera-fill"></i></span>
-                            <h5 class="mb-0 fw-bold text-primary">Evidence</h5>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold small">Photo of Vehicle <span class="text-danger">*</span></label>
-                            <input type="file" name="evidence_photo" class="form-control @error('evidence_photo') is-invalid @enderror" accept="image/*" required id="photoInput" onchange="previewPhoto(event)">
-                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Max 5MB. Clear photo showing license plate and parking violation.</small>
-                            @error('evidence_photo')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
-                            <div id="photoPreview" class="mt-3"></div>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-5">
-                <div class="card stat-card mb-4">
+                <div class="card stat-card h-100">
                     <div class="card-body p-3 p-md-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span class="section-icon"><i class="bi bi-geo-alt-fill"></i></span>
@@ -153,20 +116,58 @@
                         </small>
                     </div>
                 </div>
-
-                <div class="d-flex flex-column flex-md-row gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1 fw-semibold py-2">
-                        <i class="bi bi-send me-2"></i>Submit Request
-                    </button>
-                    <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary py-2">Cancel</a>
-                </div>
-
-                <p class="text-muted small mt-3 mb-0">
-                    <i class="bi bi-info-circle me-1"></i>
-                    By submitting this request, you confirm that the information is accurate and the vehicle is illegally parked on your property.
-                </p>
             </div>
         </div>
+
+        <div class="card stat-card mb-4">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="section-icon"><i class="bi bi-car-front-fill"></i></span>
+                    <h5 class="mb-0 fw-bold text-primary">Vehicle Information</h5>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">License Plate <span class="text-danger">*</span></label>
+                        <input type="text" name="vehicle_plate" class="form-control text-uppercase @error('vehicle_plate') is-invalid @enderror" placeholder="e.g., ABC 1234" value="{{ old('vehicle_plate') }}" required>
+                        @error('vehicle_plate')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Vehicle Description</label>
+                        <input type="text" name="vehicle_description" class="form-control" placeholder="e.g., White Toyota Corolla" value="{{ old('vehicle_description') }}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small">Additional Notes</label>
+                        <textarea name="additional_notes" class="form-control" rows="2" placeholder="Any additional details...">{{ old('additional_notes') }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card stat-card mb-4">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="section-icon"><i class="bi bi-camera-fill"></i></span>
+                    <h5 class="mb-0 fw-bold text-primary">Evidence</h5>
+                </div>
+                <label class="form-label fw-semibold small">Photo of Vehicle <span class="text-danger">*</span></label>
+                <input type="file" name="evidence_photo" class="form-control @error('evidence_photo') is-invalid @enderror" accept="image/*" required id="photoInput" onchange="previewPhoto(event)">
+                <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Max 5MB. Clear photo showing license plate and parking violation.</small>
+                @error('evidence_photo')<small class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                <div id="photoPreview" class="mt-3"></div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1 fw-semibold py-2">
+                <i class="bi bi-send me-2"></i>Submit Request
+            </button>
+            <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary py-2">Cancel</a>
+        </div>
+
+        <p class="text-muted small mt-3 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            By submitting this request, you confirm that the information is accurate and the vehicle is illegally parked on your property.
+        </p>
     </form>
 </div>
 @endsection
