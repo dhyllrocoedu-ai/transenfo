@@ -5,6 +5,9 @@
 ### Added
 - **Enforcer impounding referral**: On the citation show page, if the violation is `is_impoundable` and no clamp exists yet, Enforcers/Admins see a "Refer for Impounding" button that creates a `ClampingRecord` (status `AwaitingPayment`) and redirects to the impounding page.
 
+### Fixed
+- **500 error on registration/login** (`POST /account-procedure`): Supabase HTTP calls now catch `ConnectionException` gracefully. `attempt()` throws `ValidationException` instead of returning `null` (which caused `Auth::login(null)` → TypeError 500). Registration falls back to local-only user creation if Supabase is unreachable.
+
 ## v3.1.0 — Impounding Management + Clamping Request Overhaul
 
 ### Added

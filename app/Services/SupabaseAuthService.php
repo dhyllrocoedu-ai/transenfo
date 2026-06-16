@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -32,18 +33,32 @@ class SupabaseAuthService
             return $this->attemptViaSupabase($email, $password, $user);
         }
 
-        return $this->attemptViaLocal($email, $password, $user);
+        $localResult = $this->attemptViaLocal($email, $password, $user);
+
+        if ($localResult) {
+            return $localResult;
+        }
+
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials do not match our records.'],
+        ]);
     }
 
     protected function attemptViaSupabase(string $email, string $password, ?User $user): User
     {
-        $response = Http::withHeaders([
-            'apikey' => config('supabase.anon_key'),
-            'Content-Type' => 'application/json',
-        ])->post(config('supabase.url').'/auth/v1/token?grant_type=password', [
-            'email' => $email,
-            'password' => $password,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Content-Type' => 'application/json',
+            ])->post(config('supabase.url').'/auth/v1/token?grant_type=password', [
+                'email' => $email,
+                'password' => $password,
+            ]);
+        } catch (ConnectionException) {
+            throw ValidationException::withMessages([
+                'email' => ['Unable to connect to authentication service. Please try again.'],
+            ]);
+        }
 
         if (! $response->successful()) {
             throw ValidationException::withMessages([
@@ -95,13 +110,19 @@ class SupabaseAuthService
     {
         $redirectTo = route('password.reset', [], true);
 
-        $response = Http::withHeaders([
-            'apikey' => config('supabase.anon_key'),
-            'Content-Type' => 'application/json',
-        ])->post(config('supabase.url').'/auth/v1/recover', [
-            'email' => $email,
-            'redirect_to' => $redirectTo,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Content-Type' => 'application/json',
+            ])->post(config('supabase.url').'/auth/v1/recover', [
+                'email' => $email,
+                'redirect_to' => $redirectTo,
+            ]);
+        } catch (ConnectionException) {
+            throw ValidationException::withMessages([
+                'email' => ['Unable to connect to authentication service. Please try again.'],
+            ]);
+        }
 
         if (! $response->successful()) {
             throw ValidationException::withMessages([
@@ -110,19 +131,27 @@ class SupabaseAuthService
         }
     }
 
-    public function signupWithVerification(string $name, string $email, string $password): string
+    public function signupWithVerification(string $name, string $email, string $password): ?string
     {
+        if (! config('supabase.url')) {
+            return null;
+        }
+
         $redirectTo = config('app.url').'/email/verify/callback';
 
-        $response = Http::withHeaders([
-            'apikey' => config('supabase.anon_key'),
-            'Content-Type' => 'application/json',
-        ])->post(config('supabase.url').'/auth/v1/signup', [
-            'email' => $email,
-            'password' => $password,
-            'data' => ['name' => $name],
-            'redirect_to' => $redirectTo,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Content-Type' => 'application/json',
+            ])->post(config('supabase.url').'/auth/v1/signup', [
+                'email' => $email,
+                'password' => $password,
+                'data' => ['name' => $name],
+                'redirect_to' => $redirectTo,
+            ]);
+        } catch (ConnectionException) {
+            return null;
+        }
 
         if (! $response->successful()) {
             throw ValidationException::withMessages([
@@ -135,10 +164,14 @@ class SupabaseAuthService
 
     public function verifyEmailViaSupabase(string $accessToken): ?string
     {
-        $response = Http::withHeaders([
-            'apikey' => config('supabase.anon_key'),
-            'Authorization' => 'Bearer '.$accessToken,
-        ])->get(config('supabase.url').'/auth/v1/user');
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Authorization' => 'Bearer '.$accessToken,
+            ])->get(config('supabase.url').'/auth/v1/user');
+        } catch (ConnectionException) {
+            return null;
+        }
 
         if (! $response->successful()) {
             return null;
@@ -149,13 +182,19 @@ class SupabaseAuthService
 
     public function updatePasswordViaSupabase(string $accessToken, string $newPassword): void
     {
-        $response = Http::withHeaders([
-            'apikey' => config('supabase.anon_key'),
-            'Authorization' => 'Bearer '.$accessToken,
-            'Content-Type' => 'application/json',
-        ])->put(config('supabase.url').'/auth/v1/user', [
-            'password' => $newPassword,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Authorization' => 'Bearer '.$accessToken,
+                'Content-Type' => 'application/json',
+            ])->put(config('supabase.url').'/auth/v1/user', [
+                'password' => $newPassword,
+            ]);
+        } catch (ConnectionException) {
+            throw ValidationException::withMessages([
+                'password' => ['Unable to connect to authentication service. Please try again.'],
+            ]);
+        }
 
         if (! $response->successful()) {
             throw ValidationException::withMessages([
