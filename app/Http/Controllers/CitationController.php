@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CitationStatus;
+use App\Enums\ClampingStatus;
 use App\Http\Requests\StoreCitationRequest;
 use App\Models\Citation;
 use App\Models\CitationEvidence;
+use App\Models\ClampingRecord;
 use App\Models\ViolationType;
 use App\Services\CitationNumberService;
 use Illuminate\Http\RedirectResponse;
@@ -88,8 +90,37 @@ class CitationController extends Controller
     {
         $this->authorize('view', $citation);
 
-        $citation->load(['violationType', 'enforcer', 'evidence', 'payment.cashier']);
+        $citation->load(['violationType', 'enforcer', 'evidence', 'payment.cashier', 'clampingRecords']);
 
         return view('citations.show', compact('citation'));
+    }
+
+    public function referToImpounding(Citation $citation, CitationNumberService $numberService): RedirectResponse
+    {
+        $this->authorize('referToImpounding', ClampingRecord::class);
+
+        if (! $citation->violationType->is_impoundable) {
+            return back()->with('error', 'This violation type is not eligible for impounding.');
+        }
+
+        if ($citation->clampingRecords()->exists()) {
+            return back()->with('error', 'This citation already has a clamping record.');
+        }
+
+        $clamping = ClampingRecord::create([
+            'notice_number' => $numberService->noticeNumber(),
+            'vehicle_plate' => $citation->vehicle_plate,
+            'citation_id' => $citation->id,
+            'clamped_by' => auth()->id(),
+            'status' => ClampingStatus::AwaitingPayment,
+            'location' => $citation->location,
+            'notes' => 'Referred for impounding by ' . auth()->user()->name,
+            'clamped_at' => now(),
+        ]);
+
+        $citation->update(['status' => CitationStatus::Clamped]);
+
+        return redirect()->route('impounding.show', $clamping)
+            ->with('success', 'Vehicle referred for impounding successfully.');
     }
 }

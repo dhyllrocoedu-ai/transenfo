@@ -51,4 +51,13 @@ class ClampingPolicy
         }
         return $clampingRecord->status === ClampingStatus::WaitingRelease;
     }
+
+    public function referToImpounding(User $user): bool
+    {
+        return $user->isRole(
+            Role::SuperAdmin,
+            Role::Administrator,
+            Role::Enforcer
+        );
+    }
 }

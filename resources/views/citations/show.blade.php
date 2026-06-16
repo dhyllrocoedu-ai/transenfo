@@ -51,6 +51,23 @@
             </div>
         </div>
 
+        @if ($citation->violationType->is_impoundable && $citation->clampingRecords->isEmpty() && auth()->user()->isRole(App\Enums\Role::SuperAdmin, App\Enums\Role::Administrator, App\Enums\Role::Enforcer))
+            <div class="card stat-card mb-3 border-warning">
+                <div class="card-body text-center">
+                    <form method="POST" action="{{ route('citations.refer-impounding', $citation) }}">
+                        @csrf
+                        <button type="submit" class="btn btn-warning w-100 fw-semibold">
+                            <i class="bi bi-truck-front me-2"></i>Refer for Impounding
+                        </button>
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            This violation is eligible for impounding.
+                        </small>
+                    </form>
+                </div>
+            </div>
+        @endif
+
         @if ($citation->payment)
             <div class="card stat-card mb-3">
                 <div class="card-header bg-white"><strong>Payment</strong></div>

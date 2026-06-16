@@ -74,6 +74,7 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('citations', CitationController::class)->only(['index', 'create', 'store', 'show']);
+    Route::post('citations/{citation}/refer-impounding', [CitationController::class, 'referToImpounding'])->name('citations.refer-impounding');
     Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::resource('clamping', ClampingController::class)->only(['index', 'create', 'store', 'show']);
     Route::prefix('clamping-requests')->name('clamping-requests.')->controller(ClampingRequestController::class)->group(function () {

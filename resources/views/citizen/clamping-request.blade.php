@@ -34,8 +34,10 @@
 @section('content')
 <div class="container py-3">
     <div class="d-flex align-items-center gap-3 mb-3 flex-wrap animate-on-load">
-        <a href="{{ route('citizen.citation.lookup') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-            <i class="bi bi-arrow-left"></i>
+        <a href="{{ route('welcome') }}" class="d-inline-flex align-items-center justify-content-center text-decoration-none"
+           style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.12);color:#1e293b;transition:all 0.2s;"
+           onmouseover="this.style.background='#2563eb';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.9)';this.style.color='#1e293b'">
+            <i class="bi bi-house-door-fill" style="font-size:1.2rem;"></i>
         </a>
         <div>
             <h2 class="mb-0 h4">Report Illegally Parked Vehicle</h2>
