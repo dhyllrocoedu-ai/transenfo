@@ -35,7 +35,7 @@ class LoginController extends Controller
     public function store(Request $request, SupabaseAuthService $authService): RedirectResponse
     {
         if ($request->input('_action') === 'register') {
-            return $this->storeRegister($request);
+            return $this->storeRegister($request, $authService);
         }
 
         $credentials = $request->validate([
