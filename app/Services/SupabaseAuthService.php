@@ -7,6 +7,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class SupabaseAuthService
@@ -154,9 +155,13 @@ class SupabaseAuthService
         }
 
         if (! $response->successful()) {
-            throw ValidationException::withMessages([
-                'email' => ['Failed to create account. Please try again.'],
+            Log::warning('Supabase signup failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'email' => $email,
             ]);
+
+            return null;
         }
 
         return $response->json('id');
