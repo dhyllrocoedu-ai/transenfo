@@ -6,7 +6,7 @@
 <style>
     /* Hero Section Enhancements */
     .welcome-hero {
-        background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1e3a5f 100%);
+        background: linear-gradient(135deg, #0f2b4a 0%, #2563eb 50%, #0f2b4a 100%);
         background-size: 200% 200%;
         animation: gradientShift 8s ease infinite;
         min-height: 100vh;
@@ -74,7 +74,7 @@
 
     .btn-hero-primary {
         background: white;
-        color: #1e3a5f;
+        color: #0f2b4a;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
@@ -182,7 +182,7 @@
     .section-title h2 {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #1e3a5f;
+        color: #0f2b4a;
         margin-bottom: 1rem;
     }
 
@@ -216,7 +216,7 @@
     .feature-card-icon {
         width: 3.5rem;
         height: 3.5rem;
-        background: linear-gradient(135deg, #2563eb, #1e3a5f);
+        background: linear-gradient(135deg, #2563eb, #0f2b4a);
         border-radius: 0.8rem;
         display: grid;
         place-items: center;
@@ -229,7 +229,7 @@
         margin: 0 0 0.75rem 0;
         font-size: 1.1rem;
         font-weight: 700;
-        color: #1e3a5f;
+        color: #0f2b4a;
     }
 
     .feature-card p {
@@ -261,7 +261,7 @@
     }
 
     .benefit-box h4 {
-        color: #1e3a5f;
+        color: #0f2b4a;
         margin-bottom: 0.75rem;
         font-weight: 700;
     }
@@ -274,7 +274,7 @@
 
     /* CTA Section */
     .cta-section {
-        background: linear-gradient(135deg, #1e3a5f, #2563eb);
+        background: linear-gradient(135deg, #0f2b4a, #2563eb);
         color: white;
         padding: 4rem 2rem;
         text-align: center;
@@ -294,7 +294,7 @@
 
     /* Footer */
     .welcome-footer {
-        background: #1e3a5f;
+        background: #0f2b4a;
         color: white;
         padding: 2rem;
         text-align: center;
@@ -350,8 +350,8 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" style="z-index: 100;">
     <div class="container-fluid px-4 px-lg-5">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
-            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="32" class="me-2">
-            <span style="background: linear-gradient(135deg, #1e3a5f, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">LTEM</span>
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="32" class="me-2">
+            <span style="background: linear-gradient(135deg, #0f2b4a, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">TEMs</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -540,7 +540,7 @@
 
 <!-- Footer -->
 <footer class="welcome-footer">
-    <p>&copy; 2026 Land Transportation Enforcement Management System (LTEM). All rights reserved.</p>
+    <p>&copy; 2026 Transportation Enforcement Management System (TEMs). All rights reserved.</p>
     <p style="font-size: 0.85rem; margin-top: 1rem;">
         <a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;">Privacy Policy</a> • 
         <a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;">Terms of Service</a> • 

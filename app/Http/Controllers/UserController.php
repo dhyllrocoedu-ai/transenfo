@@ -28,7 +28,7 @@ class UserController extends Controller
             ->when($request->account_status, fn ($q, $s) => $q->where('account_status', $s))
             ->orderByRaw("CASE account_status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 WHEN 'suspended' THEN 3 ELSE 4 END")
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('users.index', ['users' => $users, 'roles' => Role::cases()]);

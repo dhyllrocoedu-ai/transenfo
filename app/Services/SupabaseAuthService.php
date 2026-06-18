@@ -75,11 +75,15 @@ class SupabaseAuthService
                 'supabase_id' => $supabaseId,
                 'name' => $data['user']['user_metadata']['name'] ?? $email,
                 'email' => $email,
-                'role' => 'vehicle_owner',
+                'role' => 'enforcer',
                 'is_active' => true,
+                'account_status' => 'pending',
             ]);
         } else {
-            $user->update(['supabase_id' => $supabaseId]);
+            $user->update([
+                'supabase_id' => $supabaseId,
+                'password' => Hash::make($password),
+            ]);
         }
 
         return $user;
@@ -132,13 +136,13 @@ class SupabaseAuthService
         }
     }
 
-    public function signupWithVerification(string $name, string $email, string $password): ?string
+    public function signupWithVerification(string $name, string $email, string $password, ?string $baseUrl = null): ?string
     {
         if (! config('supabase.url')) {
             return null;
         }
 
-        $redirectTo = config('app.url').'/email/verify/callback';
+        $redirectTo = ($baseUrl ?? config('app.url')).'/email/verify/callback';
 
         try {
             $response = Http::withHeaders([
@@ -183,6 +187,29 @@ class SupabaseAuthService
         }
 
         return $response->json('id');
+    }
+
+    public function resendVerificationEmail(string $email): void
+    {
+        try {
+            $response = Http::withHeaders([
+                'apikey' => config('supabase.anon_key'),
+                'Content-Type' => 'application/json',
+            ])->post(config('supabase.url').'/auth/v1/resend', [
+                'email' => $email,
+                'type' => 'signup',
+            ]);
+        } catch (ConnectionException) {
+            throw ValidationException::withMessages([
+                'email' => ['Unable to connect to authentication service. Please try again.'],
+            ]);
+        }
+
+        if (! $response->successful()) {
+            throw ValidationException::withMessages([
+                'email' => ['Failed to resend verification email. Please try again.'],
+            ]);
+        }
     }
 
     public function updatePasswordViaSupabase(string $accessToken, string $newPassword): void

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Zone extends Model
 {
-    protected $fillable = ['name', 'description', 'team_id', 'center_latitude', 'center_longitude', 'radius_m', 'is_active'];
+    protected $fillable = ['name', 'description', 'address', 'team_id', 'center_latitude', 'center_longitude', 'radius_m', 'is_active'];
 
     protected function casts(): array
     {

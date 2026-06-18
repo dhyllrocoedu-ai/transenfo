@@ -5,11 +5,12 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Impounded Vehicles</h1>
-    <div class="d-flex gap-2">
-        <a href="{{ route('impounding.index') }}" class="btn btn-outline-secondary btn-sm @if(!request('status')) active @endif">All</a>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ route('impounding.index') }}" class="btn btn-outline-secondary btn-sm @if(!request('status')) active @endif">Active</a>
         <a href="{{ route('impounding.index', ['status' => 'awaiting_payment']) }}" class="btn btn-outline-danger btn-sm @if(request('status') === 'awaiting_payment') active @endif">Awaiting Payment</a>
         <a href="{{ route('impounding.index', ['status' => 'paid']) }}" class="btn btn-outline-primary btn-sm @if(request('status') === 'paid') active @endif">Paid</a>
         <a href="{{ route('impounding.index', ['status' => 'waiting_release']) }}" class="btn btn-outline-warning btn-sm @if(request('status') === 'waiting_release') active @endif">Waiting Release</a>
+        <a href="{{ route('impounding.index', ['status' => 'released']) }}" class="btn btn-outline-success btn-sm @if(request('status') === 'released') active @endif">Released</a>
     </div>
 </div>
 
@@ -21,9 +22,10 @@
                     <th>Plate #</th>
                     <th>Notice #</th>
                     <th>Violation</th>
-                    <th>Issued By</th>
+                    <th>Officer</th>
                     <th>Clamped At</th>
                     <th>Status</th>
+                    <th>Evidence</th>
                     <th></th>
                 </tr>
             </thead>
@@ -36,6 +38,15 @@
                         <td>{{ $record->officer->name }}</td>
                         <td>{{ $record->clamped_at->format('M d, Y') }}</td>
                         <td><span class="badge {{ $record->status->badgeClass() }}">{{ $record->status->label() }}</span></td>
+                        <td>
+                            @if ($record->evidence_path)
+                                <a href="{{ asset('storage/'.$record->evidence_path) }}" target="_blank">
+                                    <img src="{{ asset('storage/'.$record->evidence_path) }}" alt="ev" style="width:36px;height:36px;object-fit:cover;border-radius:4px;">
+                                </a>
+                            @else
+                                <span class="text-muted small">—</span>
+                            @endif
+                        </td>
                         <td class="text-end">
                             <a href="{{ route('impounding.show', $record) }}" class="btn btn-sm btn-outline-primary">View</a>
                             @can('markPaid', $record)
@@ -53,7 +64,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="text-center text-muted py-4">No impounded vehicles found.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">No impounded vehicles found.</td></tr>
                 @endforelse
             </tbody>
         </table>

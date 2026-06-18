@@ -7,16 +7,18 @@
     <title>@yield('title', config('itevcms.app_name'))</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @stack('styles')
 </head>
 <body class="app-shell">
-<div class="d-flex">
+<div class="d-flex" style="overflow-x:hidden;">
     <aside class="sidebar d-none d-lg-flex flex-column text-white animate-on-load">
         <div class="sidebar-brand">
-            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="32" class="me-2">
-            <div>
-                <div class="brand-title text-white-50">LTEM</div>
-                <h5 class="mb-0 text-white sidebar-brand-name">{{ config('itevcms.app_name') }}</h5>
-                <small class="text-white-50">Land Transportation Enforcement</small>
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="32" class="me-2 flex-shrink-0">
+            <div class="sidebar-brand-text min-width-0">
+                <div class="brand-line"><span class="brand-highlight">T</span>ransportation</div>
+                <div class="brand-line"><span class="brand-highlight">E</span>nforcement</div>
+                <div class="brand-line"><span class="brand-highlight">M</span>anagement</div>
+                <div class="brand-line"><span class="brand-highlight">S</span>ystem</div>
             </div>
         </div>
 
@@ -79,7 +81,7 @@
 
                 <div class="dropdown">
                     <button class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center gap-2 p-0 border-0" data-bs-toggle="dropdown" aria-expanded="false" id="userDropdown">
-                        <span class="status-dot text-success" style="font-size:0.6rem;">●</span>
+                        <span class="status-dot text-success"><i class="bi bi-circle-fill" style="font-size:0.6rem;"></i></span>
                         <span class="fw-semibold small d-none d-md-inline">{{ auth()->user()->name }}</span>
                         <span class="text-muted small d-none d-lg-inline">{{ auth()->user()->role->label() }}</span>
                     </button>
@@ -92,8 +94,7 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}?tab=settings"><i class="bi bi-gear me-2"></i>Account Settings</a></li>
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}?tab=password"><i class="bi bi-key me-2"></i>Change Password</a></li>
+                        <li><a class="dropdown-item" href="{{ route('settings.index') }}"><i class="bi bi-gear me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
@@ -117,12 +118,35 @@
 
 <style>
     .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: var(--itevcms-sidebar-width, 240px);
-        min-height: 100vh;
-        background: linear-gradient(160deg, var(--itevcms-primary) 0%, #10263f 100%);
+        height: 100vh;
+        z-index: 1030;
+        background: linear-gradient(160deg, var(--itevcms-primary) 0%, #0a1f35 100%);
         box-shadow: 20px 0 45px rgba(15, 23, 42, 0.15);
         padding: 1rem 0;
-        overflow-y: auto;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .main-content {
+        margin-left: var(--itevcms-sidebar-width, 240px);
+        min-height: 100vh;
+        min-width: 0;
+    }
+
+    .min-width-0 {
+        min-width: 0;
+    }
+
+    @media (max-width: 991.98px) {
+        .main-content {
+            margin-left: 0;
+        }
     }
 
     .sidebar-brand {
@@ -134,13 +158,28 @@
         margin-bottom: 0.5rem;
     }
 
-    .sidebar-brand-name {
-        font-size: 0.9rem;
-        line-height: 1.2;
+    .sidebar-brand-text {
+        min-width: 0;
+    }
+
+    .brand-line {
+        font-size: 0.7rem;
+        line-height: 1.35;
+        font-weight: 500;
+        color: rgba(255,255,255,0.7);
+        white-space: nowrap;
+    }
+
+    .brand-highlight {
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
     }
 
     .sidebar-nav {
         gap: 0;
+        overflow-y: auto;
+        min-height: 0;
     }
 
     .sidebar-group {
@@ -189,11 +228,11 @@
         flex-shrink: 0;
     }
 
-    .sidebar::-webkit-scrollbar {
+    .sidebar-nav::-webkit-scrollbar {
         width: 4px;
     }
 
-    .sidebar::-webkit-scrollbar-thumb {
+    .sidebar-nav::-webkit-scrollbar-thumb {
         background: rgba(255,255,255,0.15);
         border-radius: 4px;
     }
@@ -204,10 +243,6 @@
 
     .topbar-icon-btn:hover {
         color: var(--itevcms-accent) !important;
-    }
-
-    .main-content {
-        min-height: 100vh;
     }
 
     #userDropdown:focus {
@@ -226,7 +261,7 @@
     .topbar {
         position: relative;
         z-index: 1020;
-        background: #fff;
+        background: var(--itevcms-card);
     }
 
     .topbar .dropdown-menu {
@@ -234,7 +269,7 @@
     }
 
     .page-bg {
-        background-color: #f8fafc;
+        background-color: var(--itevcms-surface);
     }
 
     .sticky-save {

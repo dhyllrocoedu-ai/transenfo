@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\SupabaseAuthService;
@@ -49,6 +50,7 @@ class LoginController extends Controller
         $user->update([
             'last_login_at' => now(),
             'last_login_ip' => $request->ip(),
+            'is_online' => true,
         ]);
 
         \App\Models\DeviceManager::create([
@@ -63,6 +65,12 @@ class LoginController extends Controller
 
         if ($user->isPending()) {
             return redirect()->route('account.pending');
+        }
+
+        if ($user->isRejected()) {
+            auth()->logout();
+
+            return redirect()->route('account.procedure')->withErrors(['email' => 'Your account has been rejected.']);
         }
 
         if ($user->isSuspended()) {
@@ -111,7 +119,8 @@ class LoginController extends Controller
         $supabaseId = $authService->signupWithVerification(
             $validated['name'],
             $validated['email'],
-            $validated['password']
+            $validated['password'],
+            $request->getSchemeAndHttpHost()
         );
 
         $user = User::create([
@@ -119,7 +128,8 @@ class LoginController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
-            'role' => 'VehicleOwner',
+            'password' => Hash::make($validated['password']),
+            'role' => Role::Enforcer,
             'is_active' => true,
             'account_status' => 'pending',
         ]);
@@ -131,6 +141,10 @@ class LoginController extends Controller
 
     public function destroy(SupabaseAuthService $authService): RedirectResponse
     {
+        if (auth()->check()) {
+            auth()->user()->update(['is_online' => false]);
+        }
+
         $authService->logout();
 
         return redirect()->route('account.procedure');

@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LTEM - Land Transportation Enforcement Management</title>
+    <title>TEMs - Transportation Enforcement Management System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         .hero {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0f2b4a 0%, #2563eb 50%, #0f2b4a 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease infinite;
             min-height: 100vh;
@@ -67,7 +67,7 @@
 
         .btn-hero-primary {
             background: white;
-            color: #1e3a5f;
+            color: #0f2b4a;
             font-weight: 600;
             padding: 0.85rem 2rem;
             border-radius: 0.8rem;
@@ -195,7 +195,7 @@
         .feature-card-icon {
             width: 3.5rem;
             height: 3.5rem;
-            background: linear-gradient(135deg, #2563eb, #1e3a5f);
+            background: linear-gradient(135deg, #2563eb, #0f2b4a);
             border-radius: 0.8rem;
             display: grid;
             place-items: center;
@@ -208,7 +208,7 @@
             margin: 0 0 0.75rem 0;
             font-size: 1.1rem;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #0f2b4a;
         }
 
         .feature-card p {
@@ -226,7 +226,7 @@
         .section-header h2 {
             font-size: 2.25rem;
             font-weight: 800;
-            color: #1e3a5f;
+            color: #0f2b4a;
             margin-bottom: 0.75rem;
         }
 
@@ -258,7 +258,7 @@
             padding: 1.25rem 1.5rem;
             background: #f8fbff;
             font-weight: 600;
-            color: #1e3a5f;
+            color: #0f2b4a;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -302,7 +302,7 @@
             margin: 0 auto 2rem;
             font-size: clamp(1.75rem, 4vw, 2.5rem);
             font-weight: 800;
-            color: #1e3a5f;
+            color: #0f2b4a;
         }
 
         .cta-subtitle {
@@ -312,7 +312,7 @@
         }
 
         .footer-landing {
-            background: #1e3a5f;
+            background: #0f2b4a;
             color: white;
             padding: 2rem;
             text-align: center;
@@ -352,8 +352,8 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top" style="z-index: 100;">
     <div class="container-fluid px-4 px-lg-5">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
-            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="ITEVCMS" height="32" class="me-2">
-            <span style="background: linear-gradient(135deg, #1e3a5f, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">LTEM</span>
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="32" class="me-2">
+            <span style="background: linear-gradient(135deg, #0f2b4a, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">TEMs</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -484,7 +484,7 @@
 <section class="faq-section" id="faq">
     <div class="section-header">
         <h2>Frequently Asked Questions</h2>
-        <p>Common questions about the Land Transportation Enforcement Management System</p>
+        <p>Common questions about the Transportation Enforcement Management System</p>
     </div>
     <div class="faq-container">
         <div class="faq-item">
@@ -571,7 +571,7 @@
 </section>
 
 <footer class="footer-landing">
-    <p>&copy; 2026 Land Transportation Enforcement Management System (LTEM). All rights reserved.</p>
+    <p>&copy; 2026 Transportation Enforcement Management System (TEMs). All rights reserved.</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

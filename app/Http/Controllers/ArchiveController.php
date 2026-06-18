@@ -18,11 +18,18 @@ class ArchiveController extends Controller
         $query = Archive::with('archivedBy')->latest('archived_at');
 
         if ($request->filled('type')) {
-            $query->where('archivable_type', 'App\\Models\\' . $request->type);
+            $query->where('archivable_type', $request->type);
         }
 
-        $archives = $query->paginate(20);
+        $archives = $query->paginate(12);
 
-        return view('archives.index', compact('archives'));
+        $types = Archive::select('archivable_type')
+            ->distinct()
+            ->pluck('archivable_type')
+            ->map(fn ($t) => class_basename($t))
+            ->sort()
+            ->values();
+
+        return view('archives.index', compact('archives', 'types'));
     }
 }

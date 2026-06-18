@@ -60,9 +60,19 @@
             </div>
         </div>
         <div class="mt-4">
-            <button type="submit" class="btn btn-danger">Issue Citation</button>
+            <button type="submit" class="btn btn-danger" id="submitBtn">Issue Citation</button>
             <a href="{{ route('citations.index') }}" class="btn btn-link">Cancel</a>
         </div>
     </form>
 </div></div>
+
+@push('scripts')
+<script>
+    document.getElementById('submitBtn')?.addEventListener('click', function () {
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Submitting...';
+        this.closest('form').submit();
+    });
+</script>
+@endpush
 @endsection

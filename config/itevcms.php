@@ -6,6 +6,6 @@ return [
 
     'clamping_eligible_days' => (int) env('ITEVCMS_CLAMPING_ELIGIBLE_DAYS', 30),
 
-    'app_name' => env('APP_NAME', 'ITEVCMS'),
+    'app_name' => env('APP_NAME', 'TEMs'),
 
 ];

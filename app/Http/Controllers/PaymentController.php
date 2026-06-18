@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\CitationStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Requests\StorePaymentRequest;
+use App\Models\Archive;
 use App\Models\Citation;
 use App\Models\Payment;
-use App\Services\CitationNumberService;
+use App\Models\NumberSeries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class PaymentController extends Controller
 
         $query = Payment::with(['citation', 'cashier'])->whereNotNull('paid_at');
 
-        $payments = $query->latest('paid_at')->paginate(15);
+        $payments = $query->latest('paid_at')->paginate(10);
 
         return view('payments.index', compact('payments'));
     }
@@ -72,6 +73,15 @@ class PaymentController extends Controller
             ]);
 
             $citation->update(['status' => CitationStatus::Paid]);
+
+            Archive::create([
+                'archivable_type' => Citation::class,
+                'archivable_id' => $citation->id,
+                'archived_by' => auth()->id(),
+                'archived_at' => now(),
+                'reason' => 'Citation paid - Receipt: '.($payment->receipt_number ?? 'N/A'),
+                'snapshot' => $citation->refresh()->toArray(),
+            ]);
 
             return $payment;
         });

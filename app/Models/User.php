@@ -29,6 +29,8 @@ class User extends Authenticatable
         'profile_photo_path',
         'last_login_at',
         'last_login_ip',
+        'is_online',
+        'preferences',
     ];
 
     protected $hidden = [
@@ -44,6 +46,8 @@ class User extends Authenticatable
             'role' => Role::class,
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',
+            'is_online' => 'boolean',
+            'preferences' => 'array',
         ];
     }
 

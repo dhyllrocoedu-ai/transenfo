@@ -33,6 +33,8 @@ class Citation extends Model
         'driver_license',
     ];
 
+
+
     protected function casts(): array
     {
         return [
@@ -68,6 +70,11 @@ class Citation extends Model
         return $this->hasMany(ClampingRecord::class);
     }
 
+    public function appeal(): HasOne
+    {
+        return $this->hasOne(Appeal::class)->latest('submitted_at');
+    }
+
     public function isPayable(): bool
     {
         return in_array($this->status, [
@@ -89,6 +96,11 @@ class Citation extends Model
         $encoded = urlencode($data);
 
         return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={$encoded}";
+    }
+
+    public function getQRCode(): string
+    {
+        return '<img src="' . e($this->getQRCodeUrl()) . '" alt="QR Code" class="img-fluid" style="max-width:120px">';
     }
 
     public function getActivitylogOptions(): LogOptions

@@ -10,12 +10,12 @@ class CitationPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isStaff();
     }
 
     public function view(User $user, Citation $citation): bool
     {
-        return true;
+        return $user->isStaff();
     }
 
     public function create(User $user): bool

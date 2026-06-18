@@ -2,11 +2,12 @@
 
 :root {
     --itevcms-sidebar-width: 240px;
-    --itevcms-primary: #1e3a5f;
+    --itevcms-primary: #0f2b4a;
     --itevcms-accent: #2563eb;
-    --itevcms-surface: #f4f6f9;
-    --itevcms-card: rgba(255, 255, 255, 0.92);
-    --itevcms-border: rgba(15, 23, 42, 0.08);
+    --itevcms-surface: #f1f5f9;
+    --itevcms-card: #ffffff;
+    --itevcms-border: #e2e8f0;
+    --itevcms-text-muted: #64748b;
 }
 
 * {
@@ -16,7 +17,7 @@
 body {
     background-color: var(--itevcms-surface);
     min-height: 100vh;
-    color: #14213d;
+    color: #0f172a;
 }
 
 body::before {
@@ -25,19 +26,19 @@ body::before {
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(30, 58, 95, 0.14), transparent 32%);
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(15, 43, 74, 0.10), transparent 32%);
     z-index: -1;
 }
 
 .app-shell {
-    background: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
+    background: var(--itevcms-surface);
 }
 
 .sidebar {
     width: var(--itevcms-sidebar-width);
     min-height: 100vh;
-    background: linear-gradient(160deg, var(--itevcms-primary) 0%, #10263f 100%);
+    background: linear-gradient(160deg, var(--itevcms-primary) 0%, #0a1f35 100%);
     box-shadow: 20px 0 45px rgba(15, 23, 42, 0.15);
 }
 
@@ -88,7 +89,7 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--itevcms-card);
     backdrop-filter: blur(10px);
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
 }
@@ -153,7 +154,7 @@ body::before {
 }
 
 .table-hover > tbody > tr:hover {
-    background-color: rgba(37, 99, 235, 0.05);
+    background-color: rgba(37, 99, 235, 0.04);
 }
 
 .activity-icon {
@@ -172,7 +173,7 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #0f2b4a 0%, #2563eb 100%);
 }
 
 .login-shell {
@@ -260,44 +261,44 @@ body::before {
 }
 
 .status-badge-paid {
-    border-left-color: #10b981;
-    background-color: rgba(16, 185, 129, 0.12);
-    color: #065f46;
+    border-left-color: #059669;
+    background-color: rgba(5, 150, 105, 0.12);
+    color: #064e3b;
 }
 
 .status-badge-overdue {
-    border-left-color: #ef4444;
-    background-color: rgba(239, 68, 68, 0.12);
+    border-left-color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.12);
     color: #7f1d1d;
 }
 
 .status-badge-appealed {
-    border-left-color: #8b5cf6;
-    background-color: rgba(139, 92, 246, 0.12);
+    border-left-color: #7c3aed;
+    background-color: rgba(124, 58, 237, 0.12);
     color: #4c1d95;
 }
 
 .status-badge-approved {
-    border-left-color: #06b6d4;
-    background-color: rgba(6, 182, 212, 0.12);
+    border-left-color: #0891b2;
+    background-color: rgba(8, 145, 178, 0.12);
     color: #164e63;
 }
 
 .status-badge-rejected {
-    border-left-color: #ef4444;
-    background-color: rgba(239, 68, 68, 0.12);
+    border-left-color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.12);
     color: #7f1d1d;
 }
 
 .status-badge-resolved {
-    border-left-color: #10b981;
-    background-color: rgba(16, 185, 129, 0.12);
-    color: #065f46;
+    border-left-color: #059669;
+    background-color: rgba(5, 150, 105, 0.12);
+    color: #064e3b;
 }
 
 /* Detail Page Hero Header */
 .detail-hero {
-    background: linear-gradient(135deg, #2563eb 0%, #1e3a5f 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #0f2b4a 100%);
     color: white;
     padding: 2rem;
     border-radius: 1.1rem;
@@ -395,7 +396,7 @@ body::before {
 
 .detail-row-label {
     font-weight: 600;
-    color: #666;
+    color: var(--itevcms-text-muted);
     font-size: 0.9rem;
 }
 

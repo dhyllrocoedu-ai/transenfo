@@ -21,7 +21,7 @@ class ClampingController extends Controller
 
         $query = ClampingRecord::with(['officer', 'citation']);
 
-        $records = $query->latest('clamped_at')->paginate(15);
+        $records = $query->latest('clamped_at')->paginate(10);
 
         $pendingRequests = CitizenClampingRequest::where('status', 'pending')
             ->latest()
@@ -94,7 +94,7 @@ class ClampingController extends Controller
             $citation->update(['status' => CitationStatus::Clamped]);
         }
 
-        return redirect()->route('clamping.show', $record)->with('success', 'Vehicle clamp recorded successfully.');
+        return redirect()->route('impounding.show', $record)->with('success', 'Vehicle clamp recorded. It is now in the impounding pipeline.');
     }
 
     public function show(ClampingRecord $clamping): View

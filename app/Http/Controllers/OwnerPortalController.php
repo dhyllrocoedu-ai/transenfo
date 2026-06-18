@@ -13,7 +13,7 @@ class OwnerPortalController extends Controller
         $citations = Citation::with(['violationType', 'payment'])
             ->where('issued_by', auth()->id())
             ->latest('issued_at')
-            ->paginate(15);
+            ->paginate(10);
 
         return view('owner.citations', compact('citations'));
     }
@@ -23,7 +23,7 @@ class OwnerPortalController extends Controller
         $records = ClampingRecord::with(['citation'])
             ->where('clamped_by', auth()->id())
             ->latest('clamped_at')
-            ->paginate(15);
+            ->paginate(10);
 
         return view('owner.clamping', compact('records'));
     }

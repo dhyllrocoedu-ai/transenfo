@@ -265,4 +265,128 @@ export function initZoneEditor(containerId, options = {}) {
     return map;
 }
 
-window.__zonePicker = { initTeamZonePicker, initZoneEditor };
+export function initZoneViewer(containerId, options = {}) {
+    const {
+        styleUrl = 'https://tiles.openfreemap.org/styles/liberty',
+        center = [121.0402, 14.5432],
+        zoom = 11,
+        zones = [],
+        onZoneClick = null,
+    } = options;
+
+    const map = new maplibregl.Map({
+        container: containerId,
+        style: styleUrl,
+        center,
+        zoom,
+        attributionControl: false,
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+
+    let activeCircleLayer = null;
+    const markers = [];
+    const popup = new maplibregl.Popup({ closeButton: true, maxWidth: '280px' });
+
+    function removeActiveCircle() {
+        if (activeCircleLayer) {
+            try {
+                map.removeLayer('viewer-circle-fill');
+                map.removeLayer('viewer-circle-outline');
+                map.removeSource('viewer-circle');
+            } catch (_) {}
+            activeCircleLayer = null;
+        }
+    }
+
+    function showCircle(zone) {
+        removeActiveCircle();
+        const lng = zone.lng, lat = zone.lat, radius = zone.radius;
+        const radiusDeg = radius / 111320;
+        const points = 64;
+        const coords = [];
+        for (let i = 0; i <= points; i++) {
+            const angle = (i / points) * 2 * Math.PI;
+            const dx = radiusDeg * Math.cos(angle) / Math.cos(lat * Math.PI / 180);
+            const dy = radiusDeg * Math.sin(angle);
+            coords.push([lng + dx, lat + dy]);
+        }
+
+        map.addSource('viewer-circle', {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                geometry: { type: 'Polygon', coordinates: [coords] },
+            },
+        });
+
+        map.addLayer({
+            id: 'viewer-circle-fill',
+            type: 'fill',
+            source: 'viewer-circle',
+            paint: { 'fill-color': zone.color, 'fill-opacity': 0.12 },
+        });
+
+        map.addLayer({
+            id: 'viewer-circle-outline',
+            type: 'line',
+            source: 'viewer-circle',
+            paint: { 'line-color': zone.color, 'line-width': 2.5, 'line-dasharray': [4, 3] },
+        });
+
+        activeCircleLayer = zone.id;
+    }
+
+    map.on('load', () => {
+        zones.forEach(zone => {
+            const lng = zone.lng, lat = zone.lat;
+            if (!lng || !lat) return;
+
+            const el = document.createElement('div');
+            el.className = 'zone-viewer-marker';
+            el.style.width = '24px';
+            el.style.height = '24px';
+            el.style.cursor = 'pointer';
+            el.style.borderRadius = '50%';
+            el.style.background = zone.color;
+            el.style.border = '3px solid white';
+            el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
+            el.style.transition = 'transform 0.2s';
+
+            const marker = new maplibregl.Marker({ element: el })
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+            el.addEventListener('mouseenter', () => {
+                el.style.transform = 'scale(1.3)';
+                showCircle(zone);
+            });
+
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+            });
+
+            el.addEventListener('click', () => {
+                map.flyTo({ center: [lng, lat], zoom: 14, duration: 600 });
+                showCircle(zone);
+                popup.setLngLat([lng, lat])
+                    .setHTML(`
+                        <div style="font-weight:700;font-size:0.95rem;">${zone.name}</div>
+                        ${zone.address ? `<div style="font-size:0.8rem;color:#64748b;">📍 ${zone.address}</div>` : ''}
+                        <div style="font-size:0.8rem;color:#64748b;margin-top:2px;">
+                            ${zone.team_name ? `👥 ${zone.team_name} · ` : ''}📏 ${zone.radius}m
+                        </div>
+                    `)
+                    .addTo(map);
+                if (onZoneClick) onZoneClick(zone);
+            });
+
+            markers.push({ zone, marker, el });
+        });
+    });
+
+    return { map, markers, removeActiveCircle };
+}
+
+window.__zonePicker = { initTeamZonePicker, initZoneEditor, initZoneViewer };

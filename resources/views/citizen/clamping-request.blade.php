@@ -20,7 +20,7 @@
     .section-icon {
         width: 2rem;
         height: 2rem;
-        background: linear-gradient(135deg, #2563eb, #1e3a5f);
+        background: linear-gradient(135deg, #2563eb, #0f2b4a);
         border-radius: 0.6rem;
         display: grid;
         place-items: center;

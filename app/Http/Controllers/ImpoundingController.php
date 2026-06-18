@@ -21,18 +21,19 @@ class ImpoundingController extends Controller
     {
         $this->authorize('viewAny', ClampingRecord::class);
 
-        $query = ClampingRecord::with(['officer', 'citation.violationType'])
-            ->whereIn('status', [
+        $query = ClampingRecord::with(['officer', 'citation.violationType']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        } else {
+            $query->whereIn('status', [
                 ClampingStatus::AwaitingPayment,
                 ClampingStatus::Paid,
                 ClampingStatus::WaitingRelease,
             ]);
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
         }
 
-        $records = $query->latest('clamped_at')->paginate(20);
+        $records = $query->latest('clamped_at')->paginate(10);
 
         return view('impounding.index', compact('records'));
     }
@@ -44,7 +45,7 @@ class ImpoundingController extends Controller
         $clamping->load([
             'officer',
             'citation.violationType',
-            'citation.payment',
+            'citation.payment.cashier',
             'release.releasedBy',
         ]);
 
@@ -60,7 +61,7 @@ class ImpoundingController extends Controller
             'reference_number' => 'nullable|string|max:255',
         ]);
 
-        DB::transaction(function () use ($request, $clamping, $validated) {
+        DB::transaction(function () use ($clamping, $validated) {
             $citation = $clamping->citation;
 
             if ($citation && !$citation->payment) {
@@ -70,7 +71,7 @@ class ImpoundingController extends Controller
                     'receipt_number' => $numberService->receiptNumber(),
                     'citation_id' => $citation->id,
                     'cashier_id' => auth()->id(),
-                    'amount' => $citation->penalty_amount,
+                    'amount' => $citation->penalty_amount ?? 0,
                     'payment_method' => $validated['payment_method'],
                     'reference_number' => $validated['reference_number'],
                     'paid_at' => now(),
@@ -94,6 +95,22 @@ class ImpoundingController extends Controller
 
         return redirect()->route('impounding.show', $clamping)
             ->with('success', 'Vehicle marked as waiting for release.');
+    }
+
+    public function printRelease(ClampingRecord $clamping): View
+    {
+        $this->authorize('view', $clamping);
+
+        abort_if($clamping->status !== ClampingStatus::Released, 404);
+
+        $clamping->load([
+            'officer',
+            'citation.violationType',
+            'citation.payment.cashier',
+            'release.releasedBy',
+        ]);
+
+        return view('impounding.print-release', compact('clamping'));
     }
 
     public function processRelease(Request $request, ClampingRecord $clamping): RedirectResponse

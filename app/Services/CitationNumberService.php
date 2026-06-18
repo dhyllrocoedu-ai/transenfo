@@ -19,12 +19,20 @@ class CitationNumberService
 
     public function receiptNumber(): string
     {
-        return 'RCP-'.now()->format('YmdHis').'-'.strtoupper(Str::random(4));
+        do {
+            $number = 'RCP-'.now()->format('YmdHis').'-'.strtoupper(Str::random(4));
+        } while (\App\Models\Payment::where('receipt_number', $number)->exists());
+
+        return $number;
     }
 
     public function noticeNumber(): string
     {
-        return 'CLP-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+        do {
+            $number = 'CLP-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+        } while (\App\Models\ClampingRecord::where('notice_number', $number)->exists());
+
+        return $number;
     }
 
     public function releaseNumber(): string

@@ -34,7 +34,7 @@
             @if ($appeal->reviewed_by)
                 <div class="mb-3">
                     <label class="form-label">Reviewed By</label>
-                    <p class="form-control-plaintext">{{ $appeal->reviewedBy->name ?? '—' }}</p>
+                    <p class="form-control-plaintext">{{ $appeal->reviewer->name ?? '—' }}</p>
                 </div>
             @endif
             <button type="submit" class="btn btn-primary">Save Review</button>

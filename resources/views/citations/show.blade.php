@@ -77,7 +77,7 @@
                 </div>
             </div>
         @elseif ($citation->isPayable())
-            @if (auth()->user()->isRole(App\Enums\Role::SuperAdmin, App\Enums\Role::Administrator, App\Enums\Role::Cashier))
+            @can('create', App\Models\Payment::class)
                 <div class="card stat-card">
                     <div class="card-body d-grid gap-2">
                         <a href="{{ route('payments.create', ['citation_id' => $citation->id]) }}" class="btn btn-success w-100">Record Payment</a>

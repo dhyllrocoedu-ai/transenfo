@@ -10,13 +10,60 @@ use Illuminate\View\View;
 
 class ZoneController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorizeAdmin();
 
-        $zones = Zone::with('team')->latest()->get();
+        $query = Zone::with('team');
 
-        return view('zones.index', compact('zones'));
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            if ($status === 'active') $query->where('is_active', true);
+            elseif ($status === 'inactive') $query->where('is_active', false);
+        }
+
+        if ($teamId = $request->input('team_id')) {
+            $query->where('team_id', $teamId);
+        }
+
+        $zones = $query->latest()->get();
+
+        $stats = [
+            'total' => Zone::count(),
+            'assigned' => Zone::whereNotNull('team_id')->count(),
+            'unassigned' => Zone::whereNull('team_id')->count(),
+            'teams' => Team::whereHas('zones')->count(),
+        ];
+
+        $teams = Team::orderBy('name')->get(['id', 'name']);
+
+        $teamColors = [];
+        $palette = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d'];
+        foreach ($teams as $i => $team) {
+            $teamColors[$team->id] = $palette[$i % count($palette)];
+        }
+
+        $mapData = $zones->map(fn ($z) => [
+            'id' => $z->id,
+            'name' => $z->name,
+            'address' => $z->address,
+            'lat' => $z->center_latitude,
+            'lng' => $z->center_longitude,
+            'radius' => (int) $z->radius_m,
+            'team_id' => $z->team_id,
+            'team_name' => $z->team?->name,
+            'is_active' => $z->is_active,
+            'color' => $teamColors[$z->team_id] ?? '#9ca3af',
+        ]);
+
+        return view('zones.index', compact('zones', 'stats', 'teams', 'teamColors', 'mapData'));
     }
 
     public function create(): View
@@ -36,6 +83,7 @@ class ZoneController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string', 'max:500'],
             'team_id' => ['nullable', 'exists:teams,id'],
             'center_latitude' => ['required', 'numeric'],
             'center_longitude' => ['required', 'numeric'],
@@ -65,6 +113,7 @@ class ZoneController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string', 'max:500'],
             'team_id' => ['nullable', 'exists:teams,id'],
             'center_latitude' => ['required', 'numeric'],
             'center_longitude' => ['required', 'numeric'],
@@ -75,6 +124,18 @@ class ZoneController extends Controller
         $zone->update($data);
 
         return redirect()->route('zones.index')->with('success', 'Zone updated successfully.');
+    }
+
+    public function toggleActive(Zone $zone): RedirectResponse
+    {
+        $this->authorizeAdmin();
+
+        $zone->is_active = !$zone->is_active;
+        $zone->save();
+
+        return back()->with('success', 'Zone '.
+            ($zone->is_active ? 'activated' : 'deactivated').
+            ' successfully.');
     }
 
     protected function authorizeAdmin(): void

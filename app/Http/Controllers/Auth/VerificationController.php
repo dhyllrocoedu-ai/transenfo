@@ -41,7 +41,7 @@ class VerificationController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $authService->sendPasswordResetLink($request->email);
+        $authService->resendVerificationEmail($request->email);
 
         return back()->with('status', 'A new verification link has been sent to your email.');
     }

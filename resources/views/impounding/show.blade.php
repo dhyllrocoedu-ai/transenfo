@@ -10,18 +10,27 @@
     </div>
     <div class="d-flex gap-2 no-print">
         @can('markPaid', $clamping)
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payModal">Record Payment</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payModal"><i class="bi bi-cash-stack me-1"></i>Record Payment</button>
+            @if ($clamping->citation && $clamping->citation->isPayable())
+                <form action="{{ route('citations.checkout', $clamping->citation) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-globe me-1"></i>Pay Online</button>
+                </form>
+            @endif
         @endcan
         @can('markWaitingRelease', $clamping)
             <form action="{{ route('impounding.mark-waiting-release', $clamping) }}" method="POST" class="d-inline">
                 @csrf
-                <button type="submit" class="btn btn-warning">Queue for Release</button>
+                <button type="submit" class="btn btn-warning"><i class="bi bi-clock me-1"></i>Queue for Release</button>
             </form>
         @endcan
         @can('processRelease', $clamping)
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#releaseModal">Process Release</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#releaseModal"><i class="bi bi-check-all me-1"></i>Process Release</button>
         @endcan
-        <a href="{{ route('impounding.index') }}" class="btn btn-outline-secondary">Back</a>
+        @if ($clamping->status === App\Enums\ClampingStatus::Released)
+            <a href="{{ route('impounding.print-release', $clamping) }}" class="btn btn-outline-info" target="_blank"><i class="bi bi-printer me-1"></i>Print Release Order</a>
+        @endif
+        <a href="{{ route('impounding.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
     </div>
 </div>
 

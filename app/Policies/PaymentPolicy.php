@@ -20,7 +20,7 @@ class PaymentPolicy
 
     public function create(User $user): bool
     {
-        return $user->isRole(Role::Cashier);
+        return $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Cashier);
     }
 
     public function update(User $user, Payment $payment): bool

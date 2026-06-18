@@ -24,6 +24,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
 
@@ -87,16 +88,18 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     });
     Route::prefix('impounding')->name('impounding.')->controller(ImpoundingController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('{clamping}/print-release', 'printRelease')->name('print-release');
         Route::get('{clamping}', 'show')->name('show');
         Route::post('{clamping}/mark-paid', 'markPaid')->name('mark-paid');
         Route::post('{clamping}/mark-waiting-release', 'markWaitingRelease')->name('mark-waiting-release');
         Route::post('{clamping}/process-release', 'processRelease')->name('process-release');
     });
 
-    Route::resource('appeals', AppealController::class);
+    Route::resource('appeals', AppealController::class)->except(['destroy']);
     Route::resource('teams', TeamController::class);
     Route::post('teams/{team}/zones/toggle', [TeamController::class, 'toggleZone'])->name('teams.zones.toggle');
     Route::resource('zones', ZoneController::class);
+    Route::patch('zones/{zone}/toggle-active', [ZoneController::class, 'toggleActive'])->name('zones.toggle-active');
     Route::get('tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('tracking/locations', [TrackingController::class, 'locations'])->name('tracking.locations');
 
@@ -148,6 +151,10 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Settings
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
 
     // Owner Portal
     Route::prefix('owner')->name('owner.')->group(function () {

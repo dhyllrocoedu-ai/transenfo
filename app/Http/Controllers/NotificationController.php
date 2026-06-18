@@ -14,7 +14,7 @@ class NotificationController extends Controller
     {
         $notifications = SystemNotification::forUser(auth()->user())
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return view('notifications.index', compact('notifications'));
     }

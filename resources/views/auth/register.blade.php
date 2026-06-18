@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="text-center mb-4 animate-on-load">
-    <div style="background: linear-gradient(135deg, #2563eb, #1e3a5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">LTEM</div>
+    <div style="background: linear-gradient(135deg, #2563eb, #0f2b4a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">LTEM</div>
     <p class="text-muted mb-0">Create your account</p>
 </div>
 

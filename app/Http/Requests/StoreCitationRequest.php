@@ -14,7 +14,11 @@ class StoreCitationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'violation_type_id' => ['required', 'exists:violation_types,id'],
+            'violation_type_id' => ['required', 'exists:violation_types,id', function ($attribute, $value, $fail) {
+                if (! \App\Models\ViolationType::where('id', $value)->where('is_active', true)->exists()) {
+                    $fail('The selected violation type is not available.');
+                }
+            }],
             'vehicle_plate' => ['required', 'string', 'max:20'],
             'vehicle_make' => ['nullable', 'string', 'max:100'],
             'vehicle_model' => ['nullable', 'string', 'max:100'],
@@ -24,7 +28,7 @@ class StoreCitationRequest extends FormRequest
             'driver_license' => ['nullable', 'string', 'max:50'],
             'location' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
-            'evidence' => ['nullable', 'array'],
+            'evidence' => ['nullable', 'array', 'max:10'],
             'evidence.*' => ['file', 'image', 'max:5120'],
         ];
     }

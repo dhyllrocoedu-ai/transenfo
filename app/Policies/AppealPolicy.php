@@ -29,6 +29,14 @@ class AppealPolicy
 
     public function update(User $user, Appeal $appeal): bool
     {
-        return $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Enforcer);
+        if (! $user->isRole(Role::SuperAdmin, Role::Administrator, Role::Enforcer)) {
+            return false;
+        }
+
+        if ($appeal->submitted_by === $user->id) {
+            return false;
+        }
+
+        return true;
     }
 }

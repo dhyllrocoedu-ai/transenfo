@@ -17,6 +17,7 @@ class UpdateAppealRequest extends FormRequest
         return [
             'status' => ['required', Rule::in(['under_review', 'approved', 'rejected'])],
             'decision_notes' => ['nullable', 'string'],
+            'adjusted_amount' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
         ];
     }
 }

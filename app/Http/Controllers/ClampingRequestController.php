@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Role;
+use App\Models\Archive;
 use App\Models\ClampingRequest;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,9 +27,27 @@ class ClampingRequestController extends Controller
             $query->where('status', $request->status);
         }
 
-        $requests = $query->latest()->paginate(20);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('vehicle_plate', 'like', "%{$search}%")
+                  ->orWhere('requester_name', 'like', "%{$search}%")
+                  ->orWhere('location_address', 'like', "%{$search}%")
+                  ->orWhere('requester_phone', 'like', "%{$search}%");
+            });
+        }
 
-        return view('clamping-requests.index', compact('requests'));
+        $requests = $query->latest()->paginate(10);
+
+        $stats = [
+            'total' => ClampingRequest::count(),
+            'pending' => ClampingRequest::where('status', 'pending')->count(),
+            'approved' => ClampingRequest::where('status', 'approved')->count(),
+            'rejected' => ClampingRequest::where('status', 'rejected')->count(),
+            'resolved' => ClampingRequest::where('status', 'resolved')->count(),
+        ];
+
+        return view('clamping-requests.index', compact('requests', 'stats'));
     }
 
     public function show(ClampingRequest $clampingRequest): View
@@ -110,6 +128,15 @@ class ClampingRequestController extends Controller
             'status' => 'resolved',
             'processed_by' => auth()->id(),
             'processed_at' => now(),
+        ]);
+
+        Archive::create([
+            'archivable_type' => ClampingRequest::class,
+            'archivable_id' => $clampingRequest->id,
+            'archived_by' => auth()->id(),
+            'archived_at' => now(),
+            'reason' => 'Clamping request resolved',
+            'snapshot' => $clampingRequest->refresh()->toArray(),
         ]);
 
         return redirect()->route('clamping-requests.show', $clampingRequest)

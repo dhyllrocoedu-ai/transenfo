@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Archive;
 use App\Models\Citation;
 use App\Models\Payment;
 use App\Services\CitationNumberService;
@@ -88,6 +89,15 @@ class PayMongoController extends Controller
 
                     $payment->citation->update(['status' => \App\Enums\CitationStatus::Paid]);
 
+                    Archive::create([
+                        'archivable_type' => Citation::class,
+                        'archivable_id' => $payment->citation->id,
+                        'archived_by' => auth()->id(),
+                        'archived_at' => now(),
+                        'reason' => 'Citation paid online via PayMongo',
+                        'snapshot' => $payment->citation->refresh()->toArray(),
+                    ]);
+
                     \App\Models\SystemNotification::notify(
                         $payment->citation->enforcer,
                         'payment_received',
@@ -137,6 +147,15 @@ class PayMongoController extends Controller
                         ]);
 
                         $payment->citation->update(['status' => \App\Enums\CitationStatus::Paid]);
+
+                        Archive::create([
+                            'archivable_type' => Citation::class,
+                            'archivable_id' => $payment->citation->id,
+                            'archived_by' => null,
+                            'archived_at' => now(),
+                            'reason' => 'Citation paid online via PayMongo (webhook)',
+                            'snapshot' => $payment->citation->refresh()->toArray(),
+                        ]);
                     } catch (\Throwable $e) {
                         report($e);
                     }
