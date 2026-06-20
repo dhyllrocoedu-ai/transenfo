@@ -3,6 +3,7 @@
 @section('title', 'Zone Management')
 
 @push('styles')
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
 <style>
     .zone-map-container { width:100%; height:100%; min-height:500px; border-radius:0.75rem; overflow:hidden; }
     .stat-card-sm {

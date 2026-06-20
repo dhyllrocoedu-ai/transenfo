@@ -3,6 +3,7 @@
 @section('title', 'Dashboard')
 
 @push('styles')
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
 <style>
     .trend-up { color:#16a34a; }
     .trend-down { color:#dc2626; }
