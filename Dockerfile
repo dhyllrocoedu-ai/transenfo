@@ -1,8 +1,7 @@
 FROM node:22-alpine AS node-build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts && \
-    npm rebuild esbuild
+RUN npm ci
 COPY vite.config.js resources/ resources/
 RUN npm run build
 
