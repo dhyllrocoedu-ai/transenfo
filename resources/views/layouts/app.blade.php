@@ -11,14 +11,14 @@
 </head>
 <body class="app-shell">
 <div class="d-flex" style="overflow-x:hidden;">
-    <aside class="sidebar d-none d-lg-flex flex-column text-white animate-on-load">
+    <aside class="sidebar animate-on-load">
         <div class="sidebar-brand">
             <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" class="sidebar-logo">
             <div class="sidebar-brand-title">TEMs</div>
             <div class="sidebar-brand-sub">Transportation Enforcement Management System</div>
         </div>
 
-        <nav class="nav flex-column flex-grow-1 sidebar-nav">
+        <nav class="sidebar-nav">
             @foreach ($navGroups ?? [] as $group)
                 <div class="sidebar-group">
                     <div class="sidebar-group-label">{{ $group['label'] }}</div>
@@ -124,9 +124,8 @@
         z-index: 1030;
         background: linear-gradient(160deg, var(--itevcms-primary) 0%, #0a1f35 100%);
         box-shadow: 20px 0 45px rgba(15, 23, 42, 0.15);
-        padding: 0;
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column !important;
         overflow: hidden;
     }
 
@@ -185,11 +184,15 @@
     }
 
     .sidebar-nav {
-        flex: 1;
-        gap: 0;
+        flex: 1 1 auto;
         overflow-y: auto;
         overflow-x: hidden;
         padding: 0.5rem 0;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        min-height: 0;
+        gap: 0;
     }
 
     .sidebar-group {
