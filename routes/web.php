@@ -32,6 +32,8 @@ Route::get('/welcome', fn () => view('welcome'))->name('welcome');
 
 Route::get('/', fn () => redirect()->route('account.procedure'));
 
+Route::get('/health', fn () => response('ok', 200));
+
 Route::middleware('guest')->group(function () {
     Route::get('account-procedure', [LoginController::class, 'accountProcedure'])->name('account.procedure');
     Route::post('account-procedure', [LoginController::class, 'store'])->name('account.procedure.store');

@@ -43,7 +43,11 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache,testing} \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-RUN rm -rf /var/www/html/node_modules /var/www/html/.env /var/www/html/docker
+RUN rm -rf /var/www/html/node_modules /var/www/html/.env /var/www/html/docker/nginx.conf \
+    /var/www/html/docker/supervisord.conf
+
+COPY docker/start-container.sh /usr/local/bin/start-container
+RUN chmod +x /usr/local/bin/start-container
 
 EXPOSE 80
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["start-container"]
