@@ -13,13 +13,9 @@
 <div class="d-flex" style="overflow-x:hidden;">
     <aside class="sidebar d-none d-lg-flex flex-column text-white animate-on-load">
         <div class="sidebar-brand">
-            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="32" class="me-2 flex-shrink-0">
-            <div class="sidebar-brand-text min-width-0">
-                <div class="brand-line"><span class="brand-highlight">T</span>ransportation</div>
-                <div class="brand-line"><span class="brand-highlight">E</span>nforcement</div>
-                <div class="brand-line"><span class="brand-highlight">M</span>anagement</div>
-                <div class="brand-line"><span class="brand-highlight">S</span>ystem</div>
-            </div>
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="72">
+            <div class="sidebar-brand-title">TEMs</div>
+            <div class="sidebar-brand-sub">Transportation Enforcement Management System</div>
         </div>
 
         <nav class="nav flex-column flex-grow-1 sidebar-nav">
@@ -151,29 +147,32 @@
 
     .sidebar-brand {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0 1rem 1.25rem;
+        padding: 1.5rem 1rem 1rem;
         border-bottom: 1px solid rgba(255,255,255,0.1);
         margin-bottom: 0.5rem;
     }
 
-    .sidebar-brand-text {
-        min-width: 0;
+    .sidebar-brand img {
+        margin-bottom: 0.75rem;
     }
 
-    .brand-line {
-        font-size: 0.7rem;
-        line-height: 1.35;
-        font-weight: 500;
-        color: rgba(255,255,255,0.7);
-        white-space: nowrap;
-    }
-
-    .brand-highlight {
+    .sidebar-brand-title {
+        font-size: 1.1rem;
+        font-weight: 800;
         color: #fff;
-        font-weight: 700;
-        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+    }
+
+    .sidebar-brand-sub {
+        font-size: 0.65rem;
+        line-height: 1.3;
+        font-weight: 500;
+        color: rgba(255,255,255,0.55);
+        text-align: center;
+        max-width: 140px;
+        margin-top: 0.15rem;
     }
 
     .sidebar-nav {
