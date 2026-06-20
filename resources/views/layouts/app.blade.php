@@ -13,7 +13,7 @@
 <div class="d-flex" style="overflow-x:hidden;">
     <aside class="sidebar d-none d-lg-flex flex-column text-white animate-on-load">
         <div class="sidebar-brand">
-            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" height="72">
+            <img src="{{ asset('images/transpo_enfo_orig.png') }}" alt="TEMs" class="sidebar-logo">
             <div class="sidebar-brand-title">TEMs</div>
             <div class="sidebar-brand-sub">Transportation Enforcement Management System</div>
         </div>
@@ -117,20 +117,21 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: var(--itevcms-sidebar-width, 240px);
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
         height: 100vh;
         z-index: 1030;
         background: linear-gradient(160deg, var(--itevcms-primary) 0%, #0a1f35 100%);
         box-shadow: 20px 0 45px rgba(15, 23, 42, 0.15);
-        padding: 1rem 0;
-        overflow: hidden;
+        padding: 0;
         display: flex;
         flex-direction: column;
-        flex-shrink: 0;
+        overflow: hidden;
     }
 
     .main-content {
-        margin-left: var(--itevcms-sidebar-width, 240px);
+        margin-left: 220px;
         min-height: 100vh;
         min-width: 0;
     }
@@ -146,16 +147,21 @@
     }
 
     .sidebar-brand {
+        height: 190px;
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 1.5rem 1rem 1rem;
+        justify-content: center;
+        padding: 1rem;
         border-bottom: 1px solid rgba(255,255,255,0.1);
-        margin-bottom: 0.5rem;
     }
 
-    .sidebar-brand img {
-        margin-bottom: 0.75rem;
+    .sidebar-logo {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 0.5rem;
     }
 
     .sidebar-brand-title {
@@ -163,22 +169,27 @@
         font-weight: 800;
         color: #fff;
         letter-spacing: 0.04em;
+        line-height: 1.2;
     }
 
     .sidebar-brand-sub {
+        width: 140px;
+        height: 36px;
         font-size: 0.65rem;
-        line-height: 1.3;
+        line-height: 1.2;
         font-weight: 500;
         color: rgba(255,255,255,0.55);
         text-align: center;
-        max-width: 140px;
+        overflow: hidden;
         margin-top: 0.15rem;
     }
 
     .sidebar-nav {
+        flex: 1;
         gap: 0;
         overflow-y: auto;
-        min-height: 0;
+        overflow-x: hidden;
+        padding: 0.5rem 0;
     }
 
     .sidebar-group {
@@ -197,6 +208,7 @@
     .sidebar-nav .nav-link {
         display: flex;
         align-items: center;
+        white-space: nowrap;
         gap: 0.75rem;
         padding: 0.6rem 1rem;
         color: rgba(255,255,255,0.75);
