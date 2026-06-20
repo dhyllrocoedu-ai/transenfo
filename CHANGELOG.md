@@ -7,6 +7,9 @@
 - **Nginx config**: Optimised for Laravel with static asset caching, security headers, hidden file blocking
 - **Supervisor config**: Runs nginx + php-fpm under a single supervisor process
 - **.dockerignore**: Excludes dev artifacts, node_modules, vendor, storage caches from Docker context
+- **Startup script**: Generates .env from environment, runs key generation, storage:link, and migrations before launching supervisor
+- **render.yaml**: Render blueprint with Docker web service + free PostgreSQL database, auto-deploy from GitHub
+- **Health check**: `/health` endpoint returns 200 for Render's health check pings
 
 ## v4.0.0 — Dashboard Overhaul, Archives Rework, Zone Maps & Layout Stability
 
