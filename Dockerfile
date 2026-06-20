@@ -1,0 +1,49 @@
+FROM node:22-alpine AS node-build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts && \
+    npm rebuild esbuild
+COPY vite.config.js resources/ resources/
+RUN npm run build
+
+FROM composer:2 AS composer-build
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader
+COPY --from=node-build /app/public/build /app/public/build
+
+FROM php:8.3-fpm-alpine
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    postgresql-dev \
+    oniguruma-dev \
+    libzip-dev \
+    libpng-dev \
+    && docker-php-ext-install -j$(nproc) \
+    pdo_pgsql \
+    pgsql \
+    mbstring \
+    bcmath \
+    gd \
+    zip \
+    opcache \
+    && rm -rf /var/cache/apk/*
+
+COPY --from=composer-build /app /var/www/html
+COPY . /var/www/html
+
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache,testing} \
+    /var/www/html/storage/logs \
+    /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+RUN rm -rf /var/www/html/node_modules /var/www/html/.env /var/www/html/docker
+
+EXPOSE 80
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

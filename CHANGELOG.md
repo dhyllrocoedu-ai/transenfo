@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.5.0 — Docker Containerization
+
+### Added
+- **Dockerfile**: Multi-stage production build (Node Vite build → Composer install → PHP 8.3-fpm-alpine runtime)
+- **Nginx config**: Optimised for Laravel with static asset caching, security headers, hidden file blocking
+- **Supervisor config**: Runs nginx + php-fpm under a single supervisor process
+- **.dockerignore**: Excludes dev artifacts, node_modules, vendor, storage caches from Docker context
+
 ## v4.0.0 — Dashboard Overhaul, Archives Rework, Zone Maps & Layout Stability
 
 ### Added
