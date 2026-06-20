@@ -9,7 +9,7 @@ RUN npm ci
 FROM composer:2 AS composer-build
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader
+RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader --ignore-platform-req=ext-gd
 COPY --from=node-build /app/public/build /app/public/build
 
 FROM php:8.3-fpm-alpine
