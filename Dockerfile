@@ -37,7 +37,10 @@ COPY . /var/www/html
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache,testing} \
+RUN mkdir -p /var/www/html/storage/framework/sessions \
+    /var/www/html/storage/framework/views \
+    /var/www/html/storage/framework/cache \
+    /var/www/html/storage/framework/testing \
     /var/www/html/storage/logs \
     /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
