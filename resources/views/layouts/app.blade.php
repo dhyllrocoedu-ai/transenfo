@@ -188,11 +188,8 @@
         overflow-y: auto;
         overflow-x: hidden;
         padding: 0.5rem 0;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
+        display: block;
         min-height: 0;
-        gap: 0;
     }
 
     .sidebar-group {
