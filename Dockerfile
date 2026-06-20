@@ -2,14 +2,14 @@ FROM node:22-slim AS node-build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
-    COPY vite.config.js index.html ./
-    COPY resources/ resources/
-    RUN npm run build
+COPY vite.config.js index.html ./
+COPY resources/ resources/
+RUN npm run build
 
 FROM composer:2 AS composer-build
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader --ignore-platform-req=ext-gd
+RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader --ignore-platform-req=ext-gd --no-scripts
 COPY --from=node-build /app/public/build /app/public/build
 
 FROM php:8.3-fpm-alpine
