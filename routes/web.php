@@ -108,6 +108,8 @@ Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::get('tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('tracking/locations', [TrackingController::class, 'locations'])->name('tracking.locations');
 
+    Route::get('my-zone', [ZoneController::class, 'myZone'])->name('enforcer.zone');
+
     // Online Payment
     Route::get('payments/{payment}/success', [PayMongoController::class, 'success'])->name('payments.online.success');
     Route::get('payments/{payment}/cancel', [PayMongoController::class, 'cancel'])->name('payments.online.cancel');

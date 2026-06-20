@@ -132,6 +132,40 @@
                 </div>
             </div>
 
+            @if ($user->isRole(\App\Enums\Role::Enforcer, \App\Enums\Role::ClampingOfficer))
+            {{-- GPS Tracking --}}
+            <div class="card settings-card settings-section">
+                <div class="card-header">
+                    <i class="bi bi-satellite me-2"></i>GPS Tracking
+                </div>
+                <div class="card-body">
+                    <div class="toggle-row">
+                        <div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       id="gps_enabled" name="gps_enabled" value="1"
+                                       @checked($user->preferences['gps_enabled'] ?? $gpsLocation?->status === 'active')>
+                                <label class="form-check-label" for="gps_enabled">
+                                    <i class="bi bi-geo-alt me-1 text-muted"></i>Enable GPS Tracking
+                                </label>
+                            </div>
+                            <div class="form-text">Allow the system to track your real-time location for zone monitoring and dispatching.</div>
+                        </div>
+                    </div>
+                    @if ($gpsLocation && $gpsLocation->latitude && $gpsLocation->longitude)
+                    <hr class="my-2">
+                    <div class="small text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Last known location:
+                        <code>{{ $gpsLocation->latitude }}, {{ $gpsLocation->longitude }}</code>
+                        @if ($gpsLocation->last_seen_at)
+                            &middot; {{ $gpsLocation->last_seen_at->diffForHumans() }}
+                        @endif
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
+
             <div class="text-end mb-4">
                 <button type="submit" class="btn btn-primary px-4 fw-semibold">
                     <i class="bi bi-check-lg me-2"></i>Save Settings

@@ -71,6 +71,11 @@ class NavigationComposer
                 $administration[] = ['label' => 'Audit Logs', 'route' => 'audit-logs.index', 'icon' => 'journal-text'];
             }
 
+            if ($user->isRole(Role::Enforcer, Role::ClampingOfficer)) {
+                $operations[] = ['label' => 'My Archives', 'route' => 'archives.index', 'icon' => 'archive'];
+                $operations[] = ['label' => 'My Zone', 'route' => 'enforcer.zone', 'icon' => 'geo-alt-fill'];
+            }
+
             if ($user->isRole(Role::FrontDesk)) {
                 $operations[] = ['label' => 'Front Desk', 'route' => 'frontdesk.index', 'icon' => 'building'];
             }

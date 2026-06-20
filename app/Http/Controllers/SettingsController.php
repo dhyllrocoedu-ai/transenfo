@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EnforcerLocation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +18,9 @@ class SettingsController extends Controller
             : collect();
 
         $user = auth()->user();
+        $gpsLocation = EnforcerLocation::where('user_id', $user->id)->first();
 
-        return view('settings.index', compact('sessions', 'user'));
+        return view('settings.index', compact('sessions', 'user', 'gpsLocation'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -33,6 +35,7 @@ class SettingsController extends Controller
             'notify_appeals' => 'nullable|boolean',
             'notify_clamping' => 'nullable|boolean',
             'pagination_size' => 'nullable|integer|in:10,25,50',
+            'gps_enabled' => 'nullable|boolean',
         ]);
 
         $preferences = $user->preferences ?? [];
@@ -45,9 +48,20 @@ class SettingsController extends Controller
             'clamping' => $validated['notify_clamping'] ?? true,
         ];
         $preferences['pagination_size'] = $validated['pagination_size'] ?? 10;
+        $preferences['gps_enabled'] = $validated['gps_enabled'] ?? false;
 
         $user->preferences = $preferences;
         $user->save();
+
+        if ($user->isRole(\App\Enums\Role::Enforcer, \App\Enums\Role::ClampingOfficer)) {
+            $gpsLocation = EnforcerLocation::firstOrNew(['user_id' => $user->id]);
+            $gpsLocation->status = ($validated['gps_enabled'] ?? false) ? 'active' : 'inactive';
+            if (!($validated['gps_enabled'] ?? false)) {
+                $gpsLocation->latitude = $gpsLocation->latitude ?? 0;
+                $gpsLocation->longitude = $gpsLocation->longitude ?? 0;
+            }
+            $gpsLocation->save();
+        }
 
         return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
     }

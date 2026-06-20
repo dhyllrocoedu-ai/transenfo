@@ -9,6 +9,8 @@ use App\Models\Archive;
 use App\Models\Citation;
 use App\Models\Payment;
 use App\Models\NumberSeries;
+use App\Models\SystemNotification;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +84,19 @@ class PaymentController extends Controller
                 'reason' => 'Citation paid - Receipt: '.($payment->receipt_number ?? 'N/A'),
                 'snapshot' => $citation->refresh()->toArray(),
             ]);
+
+            if ($citation->issued_by) {
+                $enforcer = User::find($citation->issued_by);
+                if ($enforcer) {
+                    SystemNotification::notify(
+                        $enforcer,
+                        'payment_received',
+                        'Citation Payment Received',
+                        "Citation {$citation->citation_number} has been paid (₱".number_format($payment->amount, 2).").",
+                        ['citation_number' => $citation->citation_number, 'payment_id' => $payment->id]
+                    );
+                }
+            }
 
             return $payment;
         });

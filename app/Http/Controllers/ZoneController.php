@@ -138,6 +138,15 @@ class ZoneController extends Controller
             ' successfully.');
     }
 
+    public function myZone(): View
+    {
+        $user = auth()->user();
+        $teams = $user->teams;
+        $zones = Zone::with('team')->whereIn('team_id', $teams->pluck('id'))->where('is_active', true)->get();
+
+        return view('zones.my-zone', compact('user', 'zones', 'teams'));
+    }
+
     protected function authorizeAdmin(): void
     {
         abort_unless(auth()->user()?->isAdmin(), 403);

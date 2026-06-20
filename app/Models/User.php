@@ -91,6 +91,11 @@ class User extends Authenticatable
         return $this->hasMany(SystemNotification::class, 'user_id');
     }
 
+    public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Team::class)->withTimestamps();
+    }
+
     public function unreadNotifications(): HasMany
     {
         return $this->notifications()->where('is_read', false);

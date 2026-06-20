@@ -91,6 +91,14 @@
         border-top:1px solid #e5e7eb;
         padding:1rem 0; margin-top:2rem;
     }
+
+    /* Fix status badge visibility inside dark hero header */
+    .detail-hero .status-badge { background:rgba(255,255,255,0.2); color:#fff; border-left-color:#fff; }
+    .detail-hero .status-badge i { color:#fff; }
+    .detail-hero .status-badge-pending { background:rgba(245,158,11,0.5); }
+    .detail-hero .status-badge-approved,
+    .detail-hero .status-badge-resolved { background:rgba(5,150,105,0.5); }
+    .detail-hero .status-badge-rejected { background:rgba(220,38,38,0.5); }
 </style>
 @endpush
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Models\Archive;
 use App\Models\ClampingRequest;
+use App\Models\SystemNotification;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,6 +83,16 @@ class ClampingRequestController extends Controller
             'assigned_to' => $validated['assigned_to'] ?? $clampingRequest->assigned_to,
         ]);
 
+        if ($clampingRequest->assignedTo) {
+            SystemNotification::notify(
+                $clampingRequest->assignedTo,
+                'clamping_action',
+                'New Clamping Task Assigned',
+                "Clamping request #{$clampingRequest->id} for {$clampingRequest->vehicle_plate} has been assigned to you.",
+                ['clamping_request_id' => $clampingRequest->id]
+            );
+        }
+
         return redirect()->route('clamping-requests.show', $clampingRequest)
             ->with('success', 'Clamping request approved and assigned.');
     }
@@ -139,6 +150,17 @@ class ClampingRequestController extends Controller
             'reason' => 'Clamping request resolved',
             'snapshot' => $clampingRequest->refresh()->toArray(),
         ]);
+
+        $admins = User::whereIn('role', [Role::SuperAdmin, Role::Administrator])->get();
+        foreach ($admins as $admin) {
+            SystemNotification::notify(
+                $admin,
+                'clamping_action',
+                'Clamping Request Resolved',
+                "Clamping request #{$clampingRequest->id} for {$clampingRequest->vehicle_plate} has been resolved.",
+                ['clamping_request_id' => $clampingRequest->id]
+            );
+        }
 
         return redirect()->route('clamping-requests.show', $clampingRequest)
             ->with('success', 'Clamping request marked as resolved.');
