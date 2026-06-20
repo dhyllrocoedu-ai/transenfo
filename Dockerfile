@@ -2,8 +2,9 @@ FROM node:22-slim AS node-build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
-COPY vite.config.js resources/ resources/
-RUN npm run build
+    COPY vite.config.js index.html ./
+    COPY resources/ resources/
+    RUN npm run build
 
 FROM composer:2 AS composer-build
 WORKDIR /app
