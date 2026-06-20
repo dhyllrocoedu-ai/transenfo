@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/welcome', fn () => view('welcome'))->name('welcome');
 
-Route::get('/', fn () => redirect()->route('account.procedure'));
+Route::get('/', fn () => view('welcome'));
 
 Route::get('/health', fn () => response('ok', 200));
 
