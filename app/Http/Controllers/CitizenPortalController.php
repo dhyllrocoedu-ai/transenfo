@@ -59,7 +59,7 @@ class CitizenPortalController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'vehicle_plate' => 'required|string|max:20',
             'vehicle_description' => 'nullable|string',
-            'evidence_photo' => 'required|image|max:5120',
+            'evidence_photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
             'additional_notes' => 'nullable|string|max:1000',
         ]);
 

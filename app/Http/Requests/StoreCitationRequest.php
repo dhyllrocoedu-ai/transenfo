@@ -29,7 +29,7 @@ class StoreCitationRequest extends FormRequest
             'location' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
             'evidence' => ['nullable', 'array', 'max:10'],
-            'evidence.*' => ['file', 'image', 'max:5120'],
+            'evidence.*' => ['file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ];
     }
 }

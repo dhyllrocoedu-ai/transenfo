@@ -36,7 +36,7 @@ Route::get('/health', fn () => response('ok', 200));
 
 Route::middleware('guest')->group(function () {
     Route::get('account-procedure', [LoginController::class, 'accountProcedure'])->name('account.procedure');
-    Route::post('account-procedure', [LoginController::class, 'store'])->name('account.procedure.store');
+    Route::post('account-procedure', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('account.procedure.store');
 
     Route::get('login', [LoginController::class, 'create'])->name('login');
     Route::post('login', [LoginController::class, 'store'])->middleware('throttle:5,1');
@@ -67,10 +67,13 @@ Route::middleware('guest')->group(function () {
 Route::get('account/pending', fn () => view('auth.pending'))->name('account.pending');
 
 // Email Verification
-Route::get('email/verify', [VerificationController::class, 'showNotice'])->name('verification.notice');
 Route::get('email/verify/callback', fn () => view('auth.verify-callback'))->name('verification.callback');
 Route::post('email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
-Route::post('email/verification-notification', [VerificationController::class, 'resend'])->name('verification.resend');
+
+Route::middleware('auth')->group(function () {
+    Route::get('email/verify', [VerificationController::class, 'showNotice'])->name('verification.notice');
+    Route::post('email/verification-notification', [VerificationController::class, 'resend'])->middleware('throttle:3,1')->name('verification.resend');
+});
 
 Route::middleware(['auth', 'active', 'approved'])->group(function () {
     Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
