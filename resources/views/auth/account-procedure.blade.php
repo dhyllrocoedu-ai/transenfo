@@ -60,23 +60,6 @@
             overflow: hidden;
         }
 
-        .account-container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 420px;
-            height: 420px;
-            background-image: url('{{ asset("images/transpo_enfo_orig.png") }}');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.12;
-            pointer-events: none;
-            z-index: 0;
-        }
-
         .form-panel {
             width: 55%;
             padding: 2.5rem 3rem;
@@ -351,6 +334,33 @@
 
         .form-panel form .input-group:focus-within .form-control {
             border-color: #2563eb;
+        }
+
+        .form-panel form .input-group .input-group-text:last-child {
+            border-left: 1px solid #cbd5e1;
+            background: #fff;
+        }
+
+        .form-panel form .input-group .input-group-text:last-child i {
+            color: #475569;
+        }
+
+        .form-panel form .input-group:focus-within .input-group-text:last-child {
+            border-color: #2563eb;
+        }
+
+        .form-check-input {
+            border-color: #94a3b8;
+        }
+
+        .form-check-input:checked {
+            border-color: #2563eb;
+            background-color: #2563eb;
+        }
+
+        .form-check-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
         }
     </style>
 </head>

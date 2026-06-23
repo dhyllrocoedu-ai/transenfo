@@ -16,6 +16,10 @@ class LoginController extends Controller
     public function accountProcedure(): View|RedirectResponse
     {
         if (auth()->check()) {
+            if (auth()->user()->isPending()) {
+                return redirect()->route('account.pending');
+            }
+
             return redirect()->route('dashboard');
         }
 
@@ -27,6 +31,10 @@ class LoginController extends Controller
     public function create(): RedirectResponse
     {
         if (auth()->check()) {
+            if (auth()->user()->isPending()) {
+                return redirect()->route('account.pending');
+            }
+
             return redirect()->route('dashboard');
         }
 
@@ -100,6 +108,10 @@ class LoginController extends Controller
     public function showRegister(): RedirectResponse
     {
         if (auth()->check()) {
+            if (auth()->user()->isPending()) {
+                return redirect()->route('account.pending');
+            }
+
             return redirect()->route('dashboard');
         }
 
@@ -136,7 +148,7 @@ class LoginController extends Controller
 
         auth()->login($user);
 
-        return redirect()->route('verification.notice');
+        return redirect()->route('account.pending');
     }
 
     public function destroy(SupabaseAuthService $authService): RedirectResponse
@@ -147,6 +159,6 @@ class LoginController extends Controller
 
         $authService->logout();
 
-        return redirect()->route('account.procedure');
+        return redirect()->route('account.procedure', ['form' => 'register']);
     }
 }

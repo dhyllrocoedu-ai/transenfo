@@ -70,5 +70,11 @@
             <i class="bi bi-arrow-left me-2"></i>Back to Login
         </button>
     </form>
+
+    <div class="text-center mt-3">
+        <a href="{{ route('account.procedure', ['form' => 'register']) }}" class="text-decoration-none small">
+            <i class="bi bi-arrow-left me-1"></i>Return to Registration
+        </a>
+    </div>
 </div>
 @endsection
